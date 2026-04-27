@@ -109,9 +109,8 @@ export function WebLandingScreen() {
         <div className="absolute -bottom-32 -left-32 h-[400px] w-[400px] rounded-full bg-cyan-400/30 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-28 lg:px-8 lg:pb-32 lg:pt-36">
-          {/* Nav bar */}
+          {/* Nav bar - single row on all screens */}
           <nav className="mb-10 sm:mb-20">
-            {/* Mobile menu button */}
             <div className="flex items-center justify-between">
               {/* Logo */}
               <div className="flex items-center gap-2">
@@ -121,7 +120,36 @@ export function WebLandingScreen() {
                 <span className="text-xl font-bold text-white">Resolvé</span>
               </div>
 
-              {/* Mobile auth buttons - always visible on small screens */}
+              {/* Desktop nav links - hidden on mobile */}
+              <div className="hidden sm:flex items-center gap-6">
+                <button onClick={() => setView('home')} className="text-sm font-medium text-white/90 hover:text-white transition-colors">
+                  Inicio
+                </button>
+                <button onClick={() => setView('products')} className="text-sm font-medium text-white/90 hover:text-white transition-colors">
+                  Productos
+                </button>
+                <button className="text-sm font-medium text-white/90 hover:text-white transition-colors">
+                  Seguridad
+                </button>
+              </div>
+
+              {/* Desktop auth buttons - hidden on mobile */}
+              <div className="hidden sm:flex items-center gap-3">
+                <button
+                  onClick={() => setView('onboarding')}
+                  className="px-4 py-2 text-sm font-medium text-white/90 hover:text-white transition-colors"
+                >
+                  Iniciar sesión
+                </button>
+                <button
+                  onClick={() => setView('onboarding')}
+                  className="px-4 py-2 bg-white/20 backdrop-blur-sm text-sm font-semibold text-white rounded-lg hover:bg-white/30 transition-colors"
+                >
+                  Creá tu cuenta
+                </button>
+              </div>
+
+              {/* Mobile auth buttons - visible only on small screens */}
               <div className="flex items-center gap-2 sm:hidden">
                 <button
                   onClick={() => setView('onboarding')}
@@ -135,15 +163,13 @@ export function WebLandingScreen() {
                 >
                   Creá tu cuenta
                 </button>
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="p-2 text-white/90 hover:text-white"
+                >
+                  {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </button>
               </div>
-
-              {/* Hamburger menu for mobile nav links */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="sm:hidden p-2 text-white/90 hover:text-white"
-              >
-                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </button>
             </div>
 
             {/* Mobile menu dropdown */}
@@ -160,35 +186,6 @@ export function WebLandingScreen() {
                 </button>
               </div>
             )}
-
-            {/* Desktop nav */}
-            <div className="hidden sm:flex items-center justify-between">
-              <div className="flex items-center gap-6">
-                <button onClick={() => setView('home')} className="text-sm font-medium text-white/90 hover:text-white transition-colors">
-                  Inicio
-                </button>
-                <button onClick={() => setView('products')} className="text-sm font-medium text-white/90 hover:text-white transition-colors">
-                  Productos
-                </button>
-                <button className="text-sm font-medium text-white/90 hover:text-white transition-colors">
-                  Seguridad
-                </button>
-              </div>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setView('onboarding')}
-                  className="px-4 py-2 text-sm font-medium text-white/90 hover:text-white transition-colors"
-                >
-                  Iniciar sesión
-                </button>
-                <button
-                  onClick={() => setView('onboarding')}
-                  className="px-4 py-2 bg-white/20 backdrop-blur-sm text-sm font-semibold text-white rounded-lg hover:bg-white/30 transition-colors"
-                >
-                  Creá tu cuenta
-                </button>
-              </div>
-            </div>
           </nav>
 
           {/* Hero content */}
