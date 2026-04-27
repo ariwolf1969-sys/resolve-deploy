@@ -25,6 +25,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { PROFESSIONS } from '@/components/app/home-screen';
 
 // ── Inline demo product data ──────────────────────────────────────
 const DEMO_PRODUCTS = [
@@ -109,18 +110,30 @@ export function WebLandingScreen() {
           <nav className="mb-16 flex items-center justify-between sm:mb-20">
             <div className="flex items-center gap-4">
               {/* Login / Register buttons */}
-              <div className="hidden items-center gap-3 sm:flex">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <button
                   onClick={() => setView('onboarding')}
-                  className="text-sm font-medium text-white/90 hover:text-white transition-colors"
+                  className="p-2 sm:p-0 text-sm font-medium text-white/90 hover:text-white transition-colors"
+                  title="Iniciar sesión"
                 >
-                  Iniciar sesión
+                  <span className="hidden sm:inline">Iniciar sesión</span>
+                  <svg className="h-5 w-5 sm:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                    <polyline points="10 17 15 12 10 7" />
+                    <line x1="15" y1="12" x2="3" y2="12" />
+                  </svg>
                 </button>
                 <button
                   onClick={() => setView('onboarding')}
-                  className="px-4 py-2 bg-white/20 backdrop-blur-sm text-sm font-semibold text-white rounded-lg hover:bg-white/30 transition-colors"
+                  className="p-2 sm:p-0 sm:px-4 sm:py-2 bg-white/20 backdrop-blur-sm text-sm font-semibold text-white rounded-lg hover:bg-white/30 transition-colors"
                 >
-                  Creá tu cuenta
+                  <span className="hidden sm:inline">Creá tu cuenta</span>
+                  <svg className="h-5 w-5 sm:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="8.5" cy="7" r="4" />
+                    <line x1="20" y1="8" x2="20" y2="14" />
+                    <line x1="23" y1="11" x2="17" y2="11" />
+                  </svg>
                 </button>
               </div>
               {/* Divider */}
@@ -261,6 +274,42 @@ export function WebLandingScreen() {
         </div>
       </section>
 
+      {/* ──────────────── PROFESSIONALS SECTION ──────────────── */}
+      <section className="bg-white py-16 sm:py-20 lg:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Profesionales en tu zona
+            </h2>
+            <p className="mt-3 text-base text-gray-500 sm:text-lg">
+              Encontrá el profesional ideal para lo que necesitás
+            </p>
+          </div>
+          <div className="mt-10 grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+            {PROFESSIONS.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => setView('home')}
+                className="flex flex-col items-center gap-2 p-3 sm:p-4 rounded-xl border border-gray-100 bg-white hover:shadow-md hover:border-blue-200 transition-all"
+              >
+                <span className="text-2xl sm:text-3xl">{p.icon}</span>
+                <span className="text-[11px] sm:text-xs font-semibold text-center leading-tight text-gray-700">{p.name}</span>
+              </button>
+            ))}
+          </div>
+          <div className="mt-8 text-center">
+            <Button
+              variant="ghost"
+              className="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+              onClick={() => setView('home')}
+            >
+              Ver todos los profesionales
+              <ChevronRight className="ml-1 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* ──────────────── 3. PRODUCTS SECTION ──────────────── */}
       <section className="bg-white py-16 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -362,11 +411,11 @@ export function WebLandingScreen() {
       </section>
 
       {/* ──────────────── 4. TRUST & SECURITY ──────────────── */}
-      <section className="group bg-gray-50 py-16 sm:py-20 lg:py-24">
+      <section className="bg-gray-50 py-16 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 transition-colors group-hover:bg-blue-500">
-              <Shield className="h-7 w-7 text-blue-500 transition-colors group-hover:text-white" />
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100">
+              <Shield className="h-7 w-7 text-blue-500" />
             </div>
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
               Pagos 100% seguros

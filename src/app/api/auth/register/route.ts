@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs'
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, phone, password, role } = await req.json()
+    const { name, email, phone, password, role, dniNumber, province, city } = await req.json()
 
     if (!name || !name.trim()) {
       return NextResponse.json({ error: 'El nombre es requerido' }, { status: 400 })
@@ -46,6 +46,9 @@ export async function POST(req: NextRequest) {
         phone: fullPhone,
         password: hashedPassword,
         role: role || 'client',
+        dniNumber: dniNumber || undefined,
+        province: province || undefined,
+        city: city || undefined,
       },
     })
 
