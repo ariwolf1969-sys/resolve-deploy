@@ -1,0 +1,217 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String?
+  email         String   @unique
+  phone         String?  @unique
+  password      String?
+  avatar        String?
+  role          String   @default("user") // "user" | "professional"
+  profession    String?
+  bio           String?
+  city          String?
+  province      String?
+  address       String?
+  hourlyRate    Float?
+  rating        Float    @default(0)
+  reviewCount   Int      @default(0)
+  isAvailable   Boolean  @default(true)
+  isVerified    Boolean  @default(false)
+  skills        String?  // JSON array stored as string
+  experience    String?
+  education     String?
+  certifications String? // JSON array stored as string
+  socialLinks   String?  // JSON object stored as string
+  portfolio     String?  // JSON array of portfolio items
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  needs         Need[]
+  responses     Response[]
+  sentQuotes    Quote[]       @relation("SentQuotes")
+  receivedQuotes Quote[]      @relation("ReceivedQuotes")
+  sentMessages  Message[]
+  receivedRatings Rating[]  @relation("ReceivedRatings")
+  givenRatings Rating[]     @relation("GivenRatings")
+  affiliateClicks AffiliateClick[]
+  transactions  Transaction[]
+  checkIns      CheckIn[]
+  disputes      Dispute[]
+  chatThreads   ChatThreadParticipant[]
+}
+
+model Need {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  category    String?
+  urgency     String   @default("medium") // "low" | "medium" | "high"
+  status      String   @default("open")  // "open" | "in_progress" | "completed" | "cancelled"
+  budgetMin   Float?
+  budgetMax   Float?
+  city        String?
+  province    String?
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  responses   Response[]
+}
+
+model Response {
+  id          String   @id @default(cuid())
+  message     String
+  price       Float?
+  estimatedTime String?
+  needId      String
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  need        Need     @relation(fields: [needId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ChatThread {
+  id          String   @id @default(cuid())
+  participants ChatThreadParticipant[]
+  messages    Message[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ChatThreadParticipant {
+  id          String   @id @default(cuid())
+  threadId    String
+  userId      String
+  lastReadAt  DateTime @default(now())
+  joinedAt    DateTime @default(now())
+
+  thread      ChatThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([threadId, userId])
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  content     String
+  type        String   @default("text") // "text" | "image" | "file"
+  senderId    String
+  threadId    String
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  sender      User       @relation(fields: [senderId], references: [id])
+  thread      ChatThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+}
+
+model Rating {
+  id          String   @id @default(cuid())
+  score       Int      // 1-5
+  comment     String?
+  userId      String   // rated user
+  reviewerId  String   // who gave the rating
+  quoteId     String?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation("ReceivedRatings", fields: [userId], references: [id])
+  reviewer    User     @relation("GivenRatings", fields: [reviewerId], references: [id])
+}
+
+model AffiliateProduct {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  price       Float
+  originalPrice Float?
+  imageUrl    String?
+  sourceUrl   String?
+  source      String?  // e.g. "Amazon", "MercadoLibre"
+  category    String?
+  isFeatured  Boolean  @default(false)
+  isPopular   Boolean  @default(false)
+  clickCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  clicks      AffiliateClick[]
+}
+
+model AffiliateClick {
+  id          String   @id @default(cuid())
+  productId   String
+  userId      String?
+  createdAt   DateTime @default(now())
+
+  product     AffiliateProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user        User?            @relation(fields: [userId], references: [id])
+}
+
+model Quote {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  status      String   @default("pending") // "pending" | "accepted" | "rejected" | "completed" | "cancelled"
+  price       Float?
+  urgency     String   @default("medium")
+  city        String?
+  province    String?
+  categoryId  String?
+  senderId    String   // user who requests
+  receiverId  String   // professional who receives
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sender      User     @relation("SentQuotes", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver    User     @relation("ReceivedQuotes", fields: [receiverId], references: [id], onDelete: Cascade)
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  type        String   // "payment" | "refund" | "earning" | "withdrawal"
+  amount      Float
+  status      String   @default("completed") // "pending" | "completed" | "failed" | "refunded"
+  description String?
+  quoteId     String?
+  userId      String
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CheckIn {
+  id          String   @id @default(cuid())
+  userId      String
+  date        DateTime @default(now())
+  location    String?
+  note        String?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+}
+
+model Dispute {
+  id          String   @id @default(cuid())
+  reason      String
+  description String?
+  status      String   @default("open") // "open" | "under_review" | "resolved" | "closed"
+  quoteId     String?
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
