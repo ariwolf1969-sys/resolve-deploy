@@ -37,7 +37,7 @@ type Severity = 'leve' | 'moderado' | 'grave';
 
 const severityOptions: { value: Severity; label: string; color: string; bg: string; border: string }[] = [
   { value: 'leve', label: 'Leve', color: 'text-yellow-700', bg: 'bg-yellow-50', border: 'border-yellow-300' },
-  { value: 'moderado', label: 'Moderado', color: 'text-orange-700', bg: 'bg-orange-50', border: 'border-orange-300' },
+  { value: 'moderado', label: 'Moderado', color: 'text-blue-700', bg: 'bg-blue-50', border: 'border-blue-300' },
   { value: 'grave', label: 'Grave', color: 'text-red-700', bg: 'bg-red-50', border: 'border-red-300' },
 ];
 
@@ -113,8 +113,8 @@ export function DisputeScreen() {
             <h1 className="text-lg font-bold text-gray-900">Reportar Problema</h1>
             <p className="text-[11px] text-gray-400 -mt-0.5">Centro de resolución de disputas</p>
           </div>
-          <div className="p-2 rounded-xl bg-orange-50">
-            <Scale className="h-5 w-5 text-orange-500" />
+          <div className="p-2 rounded-xl bg-blue-50">
+            <Scale className="h-5 w-5 text-blue-500" />
           </div>
         </div>
       </div>
@@ -151,18 +151,18 @@ export function DisputeScreen() {
                     onClick={() => setReporterType('client')}
                     className={`p-3 rounded-xl border-2 text-center transition-all ${
                       reporterType === 'client'
-                        ? 'border-orange-500 bg-orange-50'
+                        ? 'border-blue-500 bg-blue-50'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     <User
                       className={`h-5 w-5 mx-auto mb-1 ${
-                        reporterType === 'client' ? 'text-orange-500' : 'text-gray-400'
+                        reporterType === 'client' ? 'text-blue-500' : 'text-gray-400'
                       }`}
                     />
                     <p
                       className={`text-xs font-semibold ${
-                        reporterType === 'client' ? 'text-orange-700' : 'text-gray-600'
+                        reporterType === 'client' ? 'text-blue-700' : 'text-gray-600'
                       }`}
                     >
                       Soy el cliente
@@ -172,18 +172,18 @@ export function DisputeScreen() {
                     onClick={() => setReporterType('professional')}
                     className={`p-3 rounded-xl border-2 text-center transition-all ${
                       reporterType === 'professional'
-                        ? 'border-orange-500 bg-orange-50'
+                        ? 'border-blue-500 bg-blue-50'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     <Shield
                       className={`h-5 w-5 mx-auto mb-1 ${
-                        reporterType === 'professional' ? 'text-orange-500' : 'text-gray-400'
+                        reporterType === 'professional' ? 'text-blue-500' : 'text-gray-400'
                       }`}
                     />
                     <p
                       className={`text-xs font-semibold ${
-                        reporterType === 'professional' ? 'text-orange-700' : 'text-gray-600'
+                        reporterType === 'professional' ? 'text-blue-700' : 'text-gray-600'
                       }`}
                     >
                       Soy el profesional
@@ -200,7 +200,7 @@ export function DisputeScreen() {
                 <select
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  className="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 appearance-none"
+                  className="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 appearance-none"
                 >
                   <option value="">Seleccioná un motivo</option>
                   {disputeReasons.map((r) => (
@@ -220,7 +220,7 @@ export function DisputeScreen() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Contá en detalle qué sucedió. Cuanta más información proporciones, más rápido podremos resolver tu caso..."
-                  className="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 resize-none"
+                  className="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none"
                   rows={4}
                 />
                 <div className="flex justify-between mt-1.5">
@@ -249,9 +249,9 @@ export function DisputeScreen() {
                   {evidencePhotos.map((photo) => (
                     <div
                       key={photo}
-                      className="relative aspect-square rounded-xl bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 flex items-center justify-center"
+                      className="relative aspect-square rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 flex items-center justify-center"
                     >
-                      <ImagePlus className="h-4 w-4 text-orange-400" />
+                      <ImagePlus className="h-4 w-4 text-blue-400" />
                       <button
                         onClick={() => removeEvidencePhoto(photo)}
                         className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center shadow-sm"
@@ -263,7 +263,7 @@ export function DisputeScreen() {
                   {evidencePhotos.length < 5 && (
                     <button
                       onClick={addEvidencePhoto}
-                      className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center hover:border-orange-300 hover:bg-orange-50/50 transition-all"
+                      className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center hover:border-blue-300 hover:bg-blue-50/50 transition-all"
                     >
                       <Camera className="h-4 w-4 text-gray-300" />
                       <span className="text-[8px] text-gray-400 mt-0.5">
@@ -361,7 +361,7 @@ export function DisputeScreen() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-xs text-gray-500">Estado</span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-50 border border-orange-200 text-[11px] font-semibold text-orange-700">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 border border-blue-200 text-[11px] font-semibold text-blue-700">
                   <Clock className="h-3 w-3" />
                   En investigación
                 </span>
@@ -393,7 +393,7 @@ export function DisputeScreen() {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="p-4">
               <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Clock className="h-4 w-4 text-orange-500" />
+                <Clock className="h-4 w-4 text-blue-500" />
                 Estado del caso
               </h3>
               <div className="space-y-0">
@@ -405,7 +405,7 @@ export function DisputeScreen() {
                           step.status === 'done'
                             ? 'bg-green-500 text-white'
                             : step.status === 'current'
-                            ? 'bg-orange-500 text-white shadow-md shadow-orange-500/25 ring-4 ring-orange-100'
+                            ? 'bg-blue-500 text-white shadow-md shadow-blue-500/25 ring-4 ring-blue-100'
                             : 'bg-gray-100 text-gray-400'
                         }`}
                       >
@@ -431,7 +431,7 @@ export function DisputeScreen() {
                           step.status === 'done'
                             ? 'text-green-700'
                             : step.status === 'current'
-                            ? 'text-orange-700'
+                            ? 'text-blue-700'
                             : 'text-gray-400'
                         }`}
                       >
@@ -453,16 +453,16 @@ export function DisputeScreen() {
           </div>
 
           {/* Estimated time */}
-          <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4">
+          <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4">
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-xl bg-orange-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Clock className="h-4 w-4 text-orange-600" />
+              <div className="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Clock className="h-4 w-4 text-blue-600" />
               </div>
               <div>
-                <p className="text-xs font-bold text-orange-800">
+                <p className="text-xs font-bold text-blue-800">
                   Tiempo estimado de resolución
                 </p>
-                <p className="text-[11px] text-orange-600/80 mt-0.5 leading-relaxed">
+                <p className="text-[11px] text-blue-600/80 mt-0.5 leading-relaxed">
                   Estimamos que tu caso será resuelto en un plazo de <strong>48 horas</strong>. 
                   Recibirás notificaciones sobre cualquier actualización.
                 </p>
@@ -489,7 +489,7 @@ export function DisputeScreen() {
           {/* Back to quotes button */}
           <button
             onClick={() => setView('home')}
-            className="w-full py-3.5 bg-orange-500 text-white rounded-2xl text-sm font-bold hover:bg-orange-600 transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-500/25"
+            className="w-full py-3.5 bg-blue-500 text-white rounded-2xl text-sm font-bold hover:bg-blue-600 transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/25"
           >
             <MessageSquare className="h-4 w-4" />
             Volver a mis presupuestos

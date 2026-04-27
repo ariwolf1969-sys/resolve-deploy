@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useAppStore } from '@/store/app-store';
 import { ARGENTINA_PROVINCES, getCitiesByProvince, getWorkZonesByProvince, getProvinceName } from '@/lib/argentina-locations';
 
@@ -23,8 +23,15 @@ export function RegisterProfessionalScreen() {
   const [dniData, setDniData] = useState({
     dniNumber: '',
     dniFrontUploaded: false,
+    dniFrontFile: null as File | null,
+    dniFrontName: '',
     selfieUploaded: false,
+    selfieFile: null as File | null,
+    selfieName: '',
   });
+
+  const dniFrontRef = useRef<HTMLInputElement>(null);
+  const selfieRef = useRef<HTMLInputElement>(null);
 
   const [photoData, setPhotoData] = useState({
     profilePhotoUploaded: false,
@@ -107,7 +114,7 @@ export function RegisterProfessionalScreen() {
         {/* Progress */}
         <div className="flex gap-1 px-4 pb-3">
           {[1, 2, 3, 4, 5].map(s => (
-            <div key={s} className={`flex-1 h-1.5 rounded-full transition-colors ${s <= step ? 'bg-orange-500' : 'bg-gray-100'}`} />
+            <div key={s} className={`flex-1 h-1.5 rounded-full transition-colors ${s <= step ? 'bg-blue-500' : 'bg-gray-100'}`} />
           ))}
         </div>
       </div>
@@ -117,17 +124,17 @@ export function RegisterProfessionalScreen() {
         {step === 1 && (
           <>
             <div className="text-center mb-4">
-              <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
                 <span className="text-3xl">&#x1F4CD;</span>
               </div>
               <h2 className="text-lg font-bold">&#xBF;D&#xF3;nde trabaj&#xE1;s?</h2>
               <p className="text-sm text-muted-foreground mt-1">Contanos desde d&#xF3;nde oper&#xE1;s</p>
             </div>
 
-            <div className="bg-orange-50 border border-orange-200 rounded-2xl p-3 mb-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-3 mb-4">
               <div className="flex items-start gap-2">
                 <span className="text-lg">&#x1F30D;</span>
-                <div className="text-xs text-orange-800 leading-relaxed">
+                <div className="text-xs text-blue-800 leading-relaxed">
                   <p className="font-semibold mb-0.5">&#x1F4E1; Trabajamos en toda la Argentina</p>
                   <p>Eleg&#xED; tu provincia y ciudad para que los clientes te encuentren m&#xE1;s f&#xE1;cil.</p>
                 </div>
@@ -143,7 +150,7 @@ export function RegisterProfessionalScreen() {
                   onChange={(e) => {
                     setFormData(prev => ({ ...prev, province: e.target.value, city: '', workZone: '' }));
                   }}
-                  className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 appearance-none cursor-pointer"
+                  className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 appearance-none cursor-pointer"
                 >
                   <option value="">Seleccioná tu provincia</option>
                   {ARGENTINA_PROVINCES.map(prov => (
@@ -163,8 +170,8 @@ export function RegisterProfessionalScreen() {
                         onClick={() => setFormData(prev => ({ ...prev, workZone: prev.workZone === zone ? '' : zone }))}
                         className={`px-4 py-2.5 rounded-xl text-xs font-semibold border transition-all ${
                           formData.workZone === zone
-                            ? 'border-orange-500 bg-orange-50 text-orange-600'
-                            : 'border-gray-200 text-muted-foreground hover:border-orange-300'
+                            ? 'border-blue-500 bg-blue-50 text-blue-600'
+                            : 'border-gray-200 text-muted-foreground hover:border-blue-300'
                         }`}
                       >
                         {zone}
@@ -186,7 +193,7 @@ export function RegisterProfessionalScreen() {
                   <select
                     value={formData.city}
                     onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                    className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 appearance-none cursor-pointer"
+                    className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 appearance-none cursor-pointer"
                   >
                     <option value="">Seleccioná tu ciudad</option>
                     {cities.map(city => (
@@ -205,7 +212,7 @@ export function RegisterProfessionalScreen() {
                     placeholder="O escrib&#xED; tu ciudad/pueblo..."
                     value={formData.city && cities.includes(formData.city) ? '' : formData.city}
                     onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
-                    className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                    className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                   />
                 </div>
               )}
@@ -214,7 +221,7 @@ export function RegisterProfessionalScreen() {
             <button
               onClick={() => setStep(2)}
               disabled={!canProceedStep1}
-              className="w-full bg-orange-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-orange-600 disabled:opacity-50 transition-all mt-4"
+              className="w-full bg-blue-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-blue-600 disabled:opacity-50 transition-all mt-4"
             >
               Siguiente
             </button>
@@ -225,7 +232,7 @@ export function RegisterProfessionalScreen() {
         {step === 2 && (
           <>
             <div className="text-center mb-4">
-              <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
                 <span className="text-3xl">&#x1F6E0;&#xFE0F;</span>
               </div>
               <h2 className="text-lg font-bold">&#xBF;Cu&#xE1;l es tu profesi&#xF3;n y cu&#xE1;nto cobr&#xE1;s?</h2>
@@ -234,9 +241,9 @@ export function RegisterProfessionalScreen() {
 
             {/* Location badge */}
             {formData.province && (
-              <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-orange-50 border border-orange-200 rounded-xl">
+              <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-blue-50 border border-blue-200 rounded-xl">
                 <span className="text-sm">&#x1F4CD;</span>
-                <span className="text-xs font-medium text-orange-700">{formatLocation()}</span>
+                <span className="text-xs font-medium text-blue-700">{formatLocation()}</span>
               </div>
             )}
 
@@ -258,7 +265,7 @@ export function RegisterProfessionalScreen() {
                   placeholder="Ej: Electricista, Plomero, Carpintero..."
                   value={formData.profession}
                   onChange={(e) => setFormData(prev => ({ ...prev, profession: e.target.value }))}
-                  className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                  className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
               </div>
 
@@ -266,7 +273,7 @@ export function RegisterProfessionalScreen() {
               <div>
                 <label className="text-sm font-semibold mb-1.5 flex items-center gap-2">
                   <span>Tarifa por hora <span className="text-red-500">*</span></span>
-                  <span className="text-[10px] font-medium text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full">Obligatorio</span>
+                  <span className="text-[10px] font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">Obligatorio</span>
                 </label>
                 <div className="relative">
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-base font-bold text-muted-foreground">$</span>
@@ -276,9 +283,9 @@ export function RegisterProfessionalScreen() {
                     placeholder="Ej: 15000"
                     value={formatMoney(formData.hourlyRate)}
                     onChange={(e) => setFormData(prev => ({ ...prev, hourlyRate: e.target.value.replace(/\D/g, '') }))}
-                    className="w-full pl-9 pr-20 p-3.5 rounded-xl border-2 border-orange-200 bg-orange-50/50 text-base font-bold focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                    className="w-full pl-9 pr-20 p-3.5 rounded-xl border-2 border-blue-200 bg-blue-50/50 text-base font-bold focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                   />
-                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-orange-600 bg-orange-100 px-2 py-1 rounded-lg">ARS / hora</span>
+                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-blue-600 bg-blue-100 px-2 py-1 rounded-lg">ARS / hora</span>
                 </div>
                 <p className="text-[10px] text-muted-foreground mt-1.5">
                   &#x1F4CA; Precio promedio en Buenos Aires: Electricistas $10.000-$15.000, Plomeros $12.000-$18.000, Alba&#xF1;iles $8.000-$12.000
@@ -294,8 +301,8 @@ export function RegisterProfessionalScreen() {
                       onClick={() => setFormData(prev => ({ ...prev, experience: exp }))}
                       className={`flex-1 py-2.5 rounded-xl text-[11px] font-semibold border transition-all ${
                         formData.experience === exp
-                          ? 'border-orange-500 bg-orange-50 text-orange-600'
-                          : 'border-gray-200 text-muted-foreground hover:border-orange-300'
+                          ? 'border-blue-500 bg-blue-50 text-blue-600'
+                          : 'border-gray-200 text-muted-foreground hover:border-blue-300'
                       }`}
                     >
                       {exp}
@@ -312,7 +319,7 @@ export function RegisterProfessionalScreen() {
               <button
                 onClick={() => setStep(3)}
                 disabled={!canProceedStep2}
-                className="flex-1 bg-orange-500 text-white py-3 rounded-xl text-sm font-semibold hover:bg-orange-600 disabled:opacity-50 transition-all"
+                className="flex-1 bg-blue-500 text-white py-3 rounded-xl text-sm font-semibold hover:bg-blue-600 disabled:opacity-50 transition-all"
               >
                 Siguiente
               </button>
@@ -324,7 +331,7 @@ export function RegisterProfessionalScreen() {
         {step === 3 && (
           <>
             <div className="text-center mb-4">
-              <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
                 <span className="text-3xl">&#x1F4F7;</span>
               </div>
               <h2 className="text-lg font-bold">Tu foto y descripci&#xF3;n</h2>
@@ -333,9 +340,9 @@ export function RegisterProfessionalScreen() {
 
             {/* Location + Profession badge */}
             {(formData.province || formData.profession) && (
-              <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-orange-50 border border-orange-200 rounded-xl">
+              <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-blue-50 border border-blue-200 rounded-xl">
                 <span className="text-sm">&#x1F4CD;</span>
-                <span className="text-xs font-medium text-orange-700">
+                <span className="text-xs font-medium text-blue-700">
                   {[formData.profession, formatLocation()].filter(Boolean).join(' &middot; ')}
                 </span>
               </div>
@@ -351,7 +358,7 @@ export function RegisterProfessionalScreen() {
                 {!photoData.profilePhotoUploaded ? (
                   <button
                     onClick={() => setPhotoData(prev => ({ ...prev, profilePhotoUploaded: true }))}
-                    className="w-24 h-24 rounded-2xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-1 hover:border-orange-400 hover:bg-orange-50/50 transition-all shrink-0"
+                    className="w-24 h-24 rounded-2xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-1 hover:border-blue-400 hover:bg-blue-50/50 transition-all shrink-0"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
                       <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /><line x1="12" x2="12" y1="19" y2="19" />
@@ -360,7 +367,7 @@ export function RegisterProfessionalScreen() {
                   </button>
                 ) : (
                   <div className="relative shrink-0">
-                    <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-lg overflow-hidden">
+                    <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-lg overflow-hidden">
                       <span className="text-4xl font-bold text-white">{currentUser?.name.charAt(0)}</span>
                     </div>
                     <button
@@ -396,7 +403,7 @@ export function RegisterProfessionalScreen() {
                 onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
                 rows={5}
                 maxLength={600}
-                className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 resize-none leading-relaxed"
+                className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none leading-relaxed"
               />
               <p className="text-[10px] text-muted-foreground mt-1">{formData.bio.length}/600 caracteres</p>
             </div>
@@ -405,7 +412,7 @@ export function RegisterProfessionalScreen() {
               <button onClick={() => setStep(2)} className="flex-1 py-3 rounded-xl text-sm font-medium border border-gray-200 hover:bg-muted transition-colors">
                 Atr&#xE1;s
               </button>
-              <button onClick={() => setStep(4)} disabled={!canProceedStep3} className="flex-1 bg-orange-500 text-white py-3 rounded-xl text-sm font-semibold hover:bg-orange-600 disabled:opacity-50 transition-all">
+              <button onClick={() => setStep(4)} disabled={!canProceedStep3} className="flex-1 bg-blue-500 text-white py-3 rounded-xl text-sm font-semibold hover:bg-blue-600 disabled:opacity-50 transition-all">
                 Siguiente
               </button>
             </div>
@@ -416,7 +423,7 @@ export function RegisterProfessionalScreen() {
         {step === 4 && (
           <>
             <div className="text-center mb-4">
-              <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
                 <span className="text-3xl">&#x1F527;</span>
               </div>
               <h2 className="text-lg font-bold">Tus habilidades</h2>
@@ -431,7 +438,7 @@ export function RegisterProfessionalScreen() {
                   placeholder="Ej: Instalaciones, reparaciones, tableros, LED"
                   value={formData.skills}
                   onChange={(e) => setFormData(prev => ({ ...prev, skills: e.target.value }))}
-                  className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                  className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 />
                 <p className="text-[10px] text-muted-foreground mt-1">Separ&#xE1; con comas. Cuantos m&#xE1;s agregues, m&#xE1;s f&#xE1;cil te van a encontrar.</p>
               </div>
@@ -441,7 +448,7 @@ export function RegisterProfessionalScreen() {
                 <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4">
                   <p className="text-xs font-semibold text-muted-foreground mb-3">As&#xED; te van a ver los clientes:</p>
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                       <span className="text-lg font-bold text-white">{currentUser?.name.charAt(0)}</span>
                     </div>
                     <div className="flex-1 min-w-0">
@@ -451,7 +458,7 @@ export function RegisterProfessionalScreen() {
                           <span className="px-1.5 py-0.5 rounded bg-green-100 text-green-600 text-[8px] font-bold">&#x2713; Foto verificada</span>
                         )}
                       </div>
-                      <p className="text-xs text-orange-600 font-medium">{formData.profession}</p>
+                      <p className="text-xs text-blue-600 font-medium">{formData.profession}</p>
                       {formatLocation() && (
                         <p className="text-[10px] text-muted-foreground flex items-center gap-0.5 mt-0.5">
                           <span>&#x1F4CD;</span> {formatLocation()}
@@ -471,7 +478,7 @@ export function RegisterProfessionalScreen() {
                   {formData.skills && (
                     <div className="flex flex-wrap gap-1 mt-2.5 pt-2.5 border-t border-gray-200">
                       {formData.skills.split(',').map((skill, i) => (
-                        <span key={i} className="px-2 py-0.5 rounded-md bg-orange-50 text-[9px] text-orange-600 font-medium">{skill.trim()}</span>
+                        <span key={i} className="px-2 py-0.5 rounded-md bg-blue-50 text-[9px] text-blue-600 font-medium">{skill.trim()}</span>
                       ))}
                     </div>
                   )}
@@ -483,7 +490,7 @@ export function RegisterProfessionalScreen() {
               <button onClick={() => setStep(3)} className="flex-1 py-3 rounded-xl text-sm font-medium border border-gray-200 hover:bg-muted transition-colors">
                 Atr&#xE1;s
               </button>
-              <button onClick={() => setStep(5)} disabled={!canProceedStep4} className="flex-1 bg-orange-500 text-white py-3 rounded-xl text-sm font-semibold hover:bg-orange-600 disabled:opacity-50 transition-all">
+              <button onClick={() => setStep(5)} disabled={!canProceedStep4} className="flex-1 bg-blue-500 text-white py-3 rounded-xl text-sm font-semibold hover:bg-blue-600 disabled:opacity-50 transition-all">
                 Siguiente
               </button>
             </div>
@@ -530,9 +537,27 @@ export function RegisterProfessionalScreen() {
               {/* DNI Front Photo */}
               <div>
                 <label className="text-sm font-semibold mb-1.5 block">Foto del DNI (frente) <span className="text-red-500">*</span></label>
+                <input
+                  ref={dniFrontRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setDniData(prev => ({
+                        ...prev,
+                        dniFrontUploaded: true,
+                        dniFrontFile: file,
+                        dniFrontName: file.name,
+                      }));
+                    }
+                  }}
+                />
                 {!dniData.dniFrontUploaded ? (
                   <button
-                    onClick={() => setDniData(prev => ({ ...prev, dniFrontUploaded: true }))}
+                    onClick={() => dniFrontRef.current?.click()}
                     className="w-full p-8 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center gap-2 hover:border-blue-400 hover:bg-blue-50/50 transition-all"
                   >
                     <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
@@ -552,9 +577,9 @@ export function RegisterProfessionalScreen() {
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-green-700">DNI subido correctamente</p>
-                      <p className="text-[10px] text-green-600">dni_frontal.jpg</p>
+                      <p className="text-[10px] text-green-600">{dniData.dniFrontName || 'dni_frontal.jpg'}</p>
                     </div>
-                    <button onClick={() => setDniData(prev => ({ ...prev, dniFrontUploaded: false }))} className="p-1 text-green-600 hover:text-green-800">
+                    <button onClick={() => setDniData(prev => ({ ...prev, dniFrontUploaded: false, dniFrontFile: null, dniFrontName: '' }))} className="p-1 text-green-600 hover:text-green-800">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M18 6 6 18M6 6l12 12" /></svg>
                     </button>
                   </div>
@@ -565,9 +590,27 @@ export function RegisterProfessionalScreen() {
               <div>
                 <label className="text-sm font-semibold mb-1.5 block">Selfie con el DNI al lado de tu rostro <span className="text-red-500">*</span></label>
                 <p className="text-[10px] text-muted-foreground mb-2">Tom&#xE1; una foto tuya sosteniendo tu DNI al lado de tu cara. Ambos deben verse claramente.</p>
+                <input
+                  ref={selfieRef}
+                  type="file"
+                  accept="image/*"
+                  capture="user"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setDniData(prev => ({
+                        ...prev,
+                        selfieUploaded: true,
+                        selfieFile: file,
+                        selfieName: file.name,
+                      }));
+                    }
+                  }}
+                />
                 {!dniData.selfieUploaded ? (
                   <button
-                    onClick={() => setDniData(prev => ({ ...prev, selfieUploaded: true }))}
+                    onClick={() => selfieRef.current?.click()}
                     className="w-full p-8 border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center gap-2 hover:border-blue-400 hover:bg-blue-50/50 transition-all"
                   >
                     <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
@@ -587,9 +630,9 @@ export function RegisterProfessionalScreen() {
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-green-700">Selfie subida correctamente</p>
-                      <p className="text-[10px] text-green-600">selfie_dni.jpg</p>
+                      <p className="text-[10px] text-green-600">{dniData.selfieName || 'selfie_dni.jpg'}</p>
                     </div>
-                    <button onClick={() => setDniData(prev => ({ ...prev, selfieUploaded: false }))} className="p-1 text-green-600 hover:text-green-800">
+                    <button onClick={() => setDniData(prev => ({ ...prev, selfieUploaded: false, selfieFile: null, selfieName: '' }))} className="p-1 text-green-600 hover:text-green-800">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M18 6 6 18M6 6l12 12" /></svg>
                     </button>
                   </div>
@@ -601,7 +644,7 @@ export function RegisterProfessionalScreen() {
                 <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4">
                   <p className="text-xs font-semibold text-muted-foreground mb-3">&#x2705; As&#xED; te van a ver los clientes:</p>
                   <div className="flex items-center gap-3">
-                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-md">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-md">
                       <span className="text-2xl font-bold text-white">{currentUser?.name.charAt(0)}</span>
                     </div>
                     <div className="flex-1 min-w-0">
@@ -614,7 +657,7 @@ export function RegisterProfessionalScreen() {
                           <span className="px-1.5 py-0.5 rounded bg-green-100 text-green-600 text-[8px] font-bold">&#x2713; Foto</span>
                         )}
                       </div>
-                      <p className="text-xs text-orange-600 font-medium">{formData.profession}</p>
+                      <p className="text-xs text-blue-600 font-medium">{formData.profession}</p>
                       {formatLocation() && (
                         <p className="text-[10px] text-muted-foreground flex items-center gap-0.5 mt-0.5">
                           <span>&#x1F4CD;</span> {formatLocation()}
@@ -632,7 +675,7 @@ export function RegisterProfessionalScreen() {
                   {formData.skills && (
                     <div className="flex flex-wrap gap-1 mt-2.5 pt-2.5 border-t border-gray-200">
                       {formData.skills.split(',').map((skill, i) => (
-                        <span key={i} className="px-2 py-0.5 rounded-md bg-orange-50 text-[9px] text-orange-600 font-medium">{skill.trim()}</span>
+                        <span key={i} className="px-2 py-0.5 rounded-md bg-blue-50 text-[9px] text-blue-600 font-medium">{skill.trim()}</span>
                       ))}
                     </div>
                   )}

@@ -28,7 +28,7 @@ const navItems = [
     view: 'register-pro' as const,
     label: 'Soy Pro',
     icon: (
-      <div className="w-12 h-12 bg-orange-500 rounded-2xl flex items-center justify-center -mt-5 shadow-lg shadow-orange-500/30">
+      <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center -mt-5 shadow-lg shadow-blue-500/30">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
           <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
           <circle cx="9" cy="7" r="4" />
@@ -75,7 +75,7 @@ export function BottomNav() {
             key={item.view}
             onClick={() => setView(item.view)}
             className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-lg transition-colors ${
-              isActive ? 'text-orange-500' : 'text-muted-foreground hover:text-foreground'
+              isActive ? 'text-blue-500' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             {item.icon}

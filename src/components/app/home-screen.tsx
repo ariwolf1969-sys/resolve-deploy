@@ -89,7 +89,7 @@ const PROFESSIONS: Category[] = [
   { id: 'aire-acondicionado', name: 'Aire acondicionado', icon: '❄️', color: '#06B6D4' },
   { id: 'computadoras', name: 'Computadoras', icon: '💻', color: '#8B5CF6' },
   { id: 'limpieza', name: 'Limpieza', icon: '✨', color: '#10B981' },
-  { id: 'cerrajero', name: 'Cerrajero', icon: '🔑', color: '#F97316' },
+  { id: 'cerrajero', name: 'Cerrajero', icon: '🔑', color: '#3B82F6' },
   { id: 'jardinero', name: 'Jardinero', icon: '🌿', color: '#22C55E' },
   { id: 'cocinero', name: 'Chef', icon: '👨‍🍳', color: '#DC2626' },
   { id: 'ninniera', name: 'Niñera/o', icon: '👶', color: '#A855F7' },
@@ -97,6 +97,10 @@ const PROFESSIONS: Category[] = [
   { id: 'vidriero', name: 'Vidriero', icon: '🪟', color: '#60A5FA' },
   { id: 'mueblero', name: 'Mueblero', icon: '🛋️', color: '#78350F' },
   { id: 'electricista-auto', name: 'Electricista auto', icon: '🚗', color: '#D97706' },
+  { id: 'peluquero', name: 'Peluquero', icon: '💇', color: '#EC4899' },
+  { id: 'chofer', name: 'Chofer', icon: '🚐', color: '#6B7280' },
+  { id: 'manicura', name: 'Manicura', icon: '💅', color: '#F43F5E' },
+  { id: 'apoyo-escolar', name: 'Apoyo escolar', icon: '📖', color: '#8B5CF6' },
 ];
 
 function formatBudget(amount: number): string {
@@ -212,13 +216,13 @@ function AdCarousel() {
             <button
               key={i}
               onClick={() => goTo(i)}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${i === current ? 'bg-orange-500 w-5' : 'bg-gray-300'}`}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${i === current ? 'bg-blue-500 w-5' : 'bg-gray-300'}`}
               aria-label={`Ir al anuncio ${i + 1}`}
             />
           ))}
         </div>
       </div>
-      <button className="block mx-auto mt-2 text-[10px] text-muted-foreground hover:text-orange-500 transition-colors font-medium">
+      <button className="block mx-auto mt-2 text-[10px] text-muted-foreground hover:text-blue-500 transition-colors font-medium">
         Publicá tu negocio →
       </button>
     </div>
@@ -273,12 +277,12 @@ export function HomeScreen() {
   return (
     <div className="min-h-full pb-4">
       {/* Header */}
-      <div className="bg-gradient-to-br from-orange-500 to-orange-600 px-5 pt-10 pb-6">
+      <div className="bg-gradient-to-br from-blue-500 to-blue-600 px-5 pt-10 pb-6">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-xl font-bold text-white">Resolvé</h1>
             {currentUser ? (
-              <p className="text-orange-100 text-xs mt-0.5">
+              <p className="text-blue-100 text-xs mt-0.5">
                 {currentUser.city 
                   ? `${currentUser.city}, ${currentUser.province ? getProvinceName(currentUser.province) : ''}`
                   : currentUser.province 
@@ -289,7 +293,7 @@ export function HomeScreen() {
                 }{' '}· Toda Argentina
               </p>
             ) : (
-              <p className="text-orange-100 text-xs mt-0.5">Encontrá profesionales en toda Argentina</p>
+              <p className="text-blue-100 text-xs mt-0.5">Encontrá profesionales en toda Argentina</p>
             )}
           </div>
           <button onClick={handleSeed} className="text-xs bg-white/20 text-white px-3 py-1.5 rounded-lg hover:bg-white/30 transition-colors">
@@ -302,11 +306,11 @@ export function HomeScreen() {
           onClick={() => setView('search')}
           className="w-full flex items-center gap-3 px-4 py-3.5 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow active:scale-[0.99]"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
             <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
           </svg>
           <span className="text-sm text-gray-400 flex-1 text-left">&#xBF;Qu&#xE9; profesional busc&#xE1;s?</span>
-          <span className="text-[10px] bg-orange-100 text-orange-600 px-2.5 py-1 rounded-lg font-semibold">Buscar</span>
+          <span className="text-[10px] bg-blue-100 text-blue-600 px-2.5 py-1 rounded-lg font-semibold">Buscar</span>
         </button>
       </div>
 
@@ -315,7 +319,7 @@ export function HomeScreen() {
         <div className="mb-5">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-bold text-foreground">&#x1F525; Populares</h2>
-            <button onClick={() => setView('search')} className="text-xs text-orange-500 font-semibold hover:underline">
+            <button onClick={() => setView('search')} className="text-xs text-blue-500 font-semibold hover:underline">
               Ver todos
             </button>
           </div>
@@ -324,7 +328,7 @@ export function HomeScreen() {
               <button
                 key={p.id}
                 onClick={() => handleProfessionClick(p.name)}
-                className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-gray-100 bg-white hover:shadow-md hover:border-orange-200 transition-all active:scale-95 shadow-sm"
+                className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-gray-100 bg-white hover:shadow-md hover:border-blue-200 transition-all active:scale-95 shadow-sm"
               >
                 <span className="text-2xl">{p.icon}</span>
                 <span className="text-[10px] font-semibold text-center leading-tight text-foreground">{p.name}</span>
@@ -334,29 +338,29 @@ export function HomeScreen() {
         </div>
 
         {/* How it works */}
-        <div className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-100 rounded-2xl p-4 mb-5">
-          <h3 className="text-xs font-bold text-orange-800 mb-3">&#x1F4D6; &#xBF;C&#xF3;mo funciona?</h3>
+        <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-100 rounded-2xl p-4 mb-5">
+          <h3 className="text-xs font-bold text-blue-800 mb-3">&#x1F4D6; &#xBF;C&#xF3;mo funciona?</h3>
           <div className="grid grid-cols-3 gap-3">
             <div className="text-center">
-              <div className="w-10 h-10 bg-orange-200 rounded-xl flex items-center justify-center mx-auto mb-1.5">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-orange-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+              <div className="w-10 h-10 bg-blue-200 rounded-xl flex items-center justify-center mx-auto mb-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
               </div>
-              <p className="text-[9px] font-semibold text-orange-800">Busc&#xE1;</p>
-              <p className="text-[8px] text-orange-600">Encontr&#xE1; el profesional que necesit&#xE1;s en tu zona</p>
+              <p className="text-[9px] font-semibold text-blue-800">Busc&#xE1;</p>
+              <p className="text-[8px] text-blue-600">Encontr&#xE1; el profesional que necesit&#xE1;s en tu zona</p>
             </div>
             <div className="text-center">
-              <div className="w-10 h-10 bg-orange-200 rounded-xl flex items-center justify-center mx-auto mb-1.5">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-orange-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+              <div className="w-10 h-10 bg-blue-200 rounded-xl flex items-center justify-center mx-auto mb-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
               </div>
-              <p className="text-[9px] font-semibold text-orange-800">Contact&#xE1;</p>
-              <p className="text-[8px] text-orange-600">Chate&#xE1; directamente con ellos</p>
+              <p className="text-[9px] font-semibold text-blue-800">Contact&#xE1;</p>
+              <p className="text-[8px] text-blue-600">Chate&#xE1; directamente con ellos</p>
             </div>
             <div className="text-center">
-              <div className="w-10 h-10 bg-orange-200 rounded-xl flex items-center justify-center mx-auto mb-1.5">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-orange-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+              <div className="w-10 h-10 bg-blue-200 rounded-xl flex items-center justify-center mx-auto mb-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
               </div>
-              <p className="text-[9px] font-semibold text-orange-800">Resolv&#xE9;</p>
-              <p className="text-[8px] text-orange-600">&#xA1;Trabajo hecho!</p>
+              <p className="text-[9px] font-semibold text-blue-800">Resolv&#xE9;</p>
+              <p className="text-[8px] text-blue-600">&#xA1;Trabajo hecho!</p>
             </div>
           </div>
         </div>
@@ -387,8 +391,8 @@ export function HomeScreen() {
             </div>
           ) : topProfessionals.length === 0 ? (
             <div className="text-center py-8">
-              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
                   <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
                 </svg>
               </div>
@@ -396,7 +400,7 @@ export function HomeScreen() {
               <p className="text-muted-foreground text-sm mb-4">Carg&#xE1; datos de ejemplo para ver c&#xF3;mo funciona</p>
               <button
                 onClick={handleSeed}
-                className="bg-orange-500 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-orange-600 transition-colors"
+                className="bg-blue-500 text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-blue-600 transition-colors"
               >
                 Cargar demo
               </button>
@@ -427,7 +431,7 @@ export function HomeScreen() {
                 <button
                   key={p.id}
                   onClick={() => handleProfessionClick(p.name)}
-                  className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-gray-100 bg-white hover:shadow-md hover:border-orange-200 transition-all active:scale-95 shadow-sm"
+                  className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-gray-100 bg-white hover:shadow-md hover:border-blue-200 transition-all active:scale-95 shadow-sm"
                 >
                   <span className="text-2xl">{p.icon}</span>
                   <span className="text-[10px] font-semibold text-center leading-tight text-foreground">{p.name}</span>
@@ -496,7 +500,7 @@ function ProfessionalCard({ pro, rank, onClick }: { pro: User; rank?: number; on
       <div className="flex items-start gap-3">
         {/* Avatar with rank */}
         <div className="relative shrink-0">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-md">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-md">
             <span className="text-xl font-bold text-white">{pro.name.charAt(0)}</span>
           </div>
           {pro.available && (
@@ -522,7 +526,7 @@ function ProfessionalCard({ pro, rank, onClick }: { pro: User; rank?: number; on
           </div>
 
           {/* Profession */}
-          <p className="text-xs font-medium text-orange-600 mt-0.5">{pro.profession}</p>
+          <p className="text-xs font-medium text-blue-600 mt-0.5">{pro.profession}</p>
 
           {/* Rating + jobs */}
           <div className="flex items-center gap-3 mt-1.5">

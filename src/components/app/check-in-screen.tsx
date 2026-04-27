@@ -170,8 +170,8 @@ export function CheckInScreen() {
             <h1 className="text-lg font-bold text-gray-900">Check-in del Servicio</h1>
             <p className="text-[11px] text-gray-400 -mt-0.5">Anti-fraud · Verificación paso a paso</p>
           </div>
-          <div className="p-2 rounded-xl bg-orange-50">
-            <Shield className="h-5 w-5 text-orange-500" />
+          <div className="p-2 rounded-xl bg-blue-50">
+            <Shield className="h-5 w-5 text-blue-500" />
           </div>
         </div>
       </div>
@@ -188,7 +188,7 @@ export function CheckInScreen() {
                       step.status === 'completed'
                         ? 'bg-green-500 text-white shadow-md shadow-green-500/25'
                         : step.status === 'active'
-                        ? 'bg-orange-500 text-white shadow-md shadow-orange-500/25 ring-4 ring-orange-100'
+                        ? 'bg-blue-500 text-white shadow-md shadow-blue-500/25 ring-4 ring-blue-100'
                         : 'bg-gray-100 text-gray-400'
                     }`}
                   >
@@ -203,7 +203,7 @@ export function CheckInScreen() {
                       step.status === 'completed'
                         ? 'text-green-600 font-semibold'
                         : step.status === 'active'
-                        ? 'text-orange-600 font-semibold'
+                        ? 'text-blue-600 font-semibold'
                         : 'text-gray-400'
                     }`}
                   >
@@ -233,10 +233,10 @@ export function CheckInScreen() {
               <div className="flex items-center gap-2.5 mb-3">
                 <div
                   className={`w-8 h-8 rounded-xl flex items-center justify-center ${
-                    gpsVerified ? 'bg-green-50' : 'bg-orange-50'
+                    gpsVerified ? 'bg-green-50' : 'bg-blue-50'
                   }`}
                 >
-                  <MapPin className={`h-4 w-4 ${gpsVerified ? 'text-green-600' : 'text-orange-500'}`} />
+                  <MapPin className={`h-4 w-4 ${gpsVerified ? 'text-green-600' : 'text-blue-500'}`} />
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-gray-900">Verificación GPS</h3>
@@ -285,7 +285,7 @@ export function CheckInScreen() {
                 <button
                   onClick={simulateGPS}
                   disabled={gpsLoading}
-                  className="w-full py-3 bg-orange-500 text-white rounded-xl text-sm font-semibold hover:bg-orange-600 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-md shadow-orange-500/25"
+                  className="w-full py-3 bg-blue-500 text-white rounded-xl text-sm font-semibold hover:bg-blue-600 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-md shadow-blue-500/25"
                 >
                   {gpsLoading ? (
                     <>
@@ -359,7 +359,7 @@ export function CheckInScreen() {
                       onClick={() =>
                         addPhoto(setLocationPhotos, 2, locationPhotos)
                       }
-                      className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center hover:border-orange-300 hover:bg-orange-50/50 transition-all"
+                      className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center hover:border-blue-300 hover:bg-blue-50/50 transition-all"
                     >
                       <Camera className="h-5 w-5 text-gray-300 mb-0.5" />
                       <span className="text-[9px] text-gray-400">Agregar</span>
@@ -393,7 +393,7 @@ export function CheckInScreen() {
                       onClick={() =>
                         addPhoto(setWorkStartPhotos, 2, workStartPhotos)
                       }
-                      className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center hover:border-orange-300 hover:bg-orange-50/50 transition-all"
+                      className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center hover:border-blue-300 hover:bg-blue-50/50 transition-all"
                     >
                       <Camera className="h-5 w-5 text-gray-300 mb-0.5" />
                       <span className="text-[9px] text-gray-400">Agregar</span>
@@ -449,7 +449,7 @@ export function CheckInScreen() {
                   </div>
                   <div className="bg-white rounded-lg p-3 border border-green-100">
                     <div className="flex items-center gap-2">
-                      <Lock className="h-4 w-4 text-orange-500" />
+                      <Lock className="h-4 w-4 text-blue-500" />
                       <p className="text-xs font-semibold text-gray-700">
                         Pago retenido en Escrow
                       </p>
@@ -461,18 +461,18 @@ export function CheckInScreen() {
                 </div>
               ) : (
                 <>
-                  <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 mb-3">
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-3">
                     <div className="flex items-start gap-2">
-                      <AlertTriangle className="h-4 w-4 text-orange-500 mt-0.5 flex-shrink-0" />
-                      <p className="text-[11px] text-orange-700 leading-relaxed">
+                      <AlertTriangle className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                      <p className="text-[11px] text-blue-700 leading-relaxed">
                         Una vez confirmada la llegada, el pago quedará retenido hasta que liberes el pago al finalizar el trabajo.
                       </p>
                     </div>
                   </div>
 
                   <div className="bg-gray-50 rounded-xl p-4 mb-3 text-center">
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center mx-auto mb-2">
-                      <User className="h-7 w-7 text-orange-600" />
+                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center mx-auto mb-2">
+                      <User className="h-7 w-7 text-blue-600" />
                     </div>
                     <p className="text-sm font-bold text-gray-900">El profesional ha llegado</p>
                     <p className="text-[11px] text-gray-500 mt-0.5">
@@ -543,7 +543,7 @@ export function CheckInScreen() {
                           onClick={() =>
                             addPhoto(setProgressPhotos, 3, progressPhotos)
                           }
-                          className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center hover:border-orange-300 hover:bg-orange-50/50 transition-all"
+                          className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center hover:border-blue-300 hover:bg-blue-50/50 transition-all"
                         >
                           <Camera className="h-5 w-5 text-gray-300 mb-0.5" />
                           <span className="text-[9px] text-gray-400">Agregar</span>
@@ -571,7 +571,7 @@ export function CheckInScreen() {
                       value={progressNotes}
                       onChange={(e) => setProgressNotes(e.target.value)}
                       placeholder="Describí el trabajo realizado hasta ahora..."
-                      className="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 resize-none"
+                      className="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none"
                       rows={3}
                     />
                   </div>
@@ -579,7 +579,7 @@ export function CheckInScreen() {
                   <button
                     onClick={sendProgress}
                     disabled={progressSent || (!progressNotes.trim() && progressPhotos.length === 0)}
-                    className="w-full py-3 bg-orange-500 text-white rounded-xl text-sm font-bold hover:bg-orange-600 disabled:opacity-40 transition-all flex items-center justify-center gap-2 shadow-md shadow-orange-500/25"
+                    className="w-full py-3 bg-blue-500 text-white rounded-xl text-sm font-bold hover:bg-blue-600 disabled:opacity-40 transition-all flex items-center justify-center gap-2 shadow-md shadow-blue-500/25"
                   >
                     {progressSent ? (
                       <>
@@ -744,7 +744,7 @@ export function CheckInScreen() {
                           onClick={() =>
                             addPhoto(setCompletionPhotos, 3, completionPhotos)
                           }
-                          className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center hover:border-orange-300 hover:bg-orange-50/50 transition-all"
+                          className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center hover:border-blue-300 hover:bg-blue-50/50 transition-all"
                         >
                           <Camera className="h-5 w-5 text-gray-300 mb-0.5" />
                           <span className="text-[9px] text-gray-400">Agregar</span>

@@ -188,9 +188,9 @@ export function NeedDetailScreen() {
         {/* Details Grid */}
         <div className="grid grid-cols-2 gap-3 mb-4">
           {selectedNeed.budget && (
-            <div className="bg-orange-50 rounded-xl p-3">
-              <p className="text-[10px] uppercase tracking-wide text-orange-500 font-semibold mb-0.5">Presupuesto</p>
-              <p className="text-lg font-bold text-orange-600">{formatBudget(selectedNeed.budget)}</p>
+            <div className="bg-blue-50 rounded-xl p-3">
+              <p className="text-[10px] uppercase tracking-wide text-blue-500 font-semibold mb-0.5">Presupuesto</p>
+              <p className="text-lg font-bold text-blue-600">{formatBudget(selectedNeed.budget)}</p>
             </div>
           )}
           {selectedNeed.neighborhood && (
@@ -214,7 +214,7 @@ export function NeedDetailScreen() {
         {/* Author */}
         <div className="bg-white border border-gray-100 rounded-2xl p-4 mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center">
               <span className="text-lg font-bold text-white">{selectedNeed.author.name.charAt(0)}</span>
             </div>
             <div className="flex-1">
@@ -273,7 +273,7 @@ export function NeedDetailScreen() {
             {chatCreated ? (
               <button
                 onClick={handleOpenChat}
-                className="w-full bg-orange-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-orange-600 transition-all flex items-center justify-center gap-2"
+                className="w-full bg-blue-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-blue-600 transition-all flex items-center justify-center gap-2"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -285,7 +285,7 @@ export function NeedDetailScreen() {
                 {!showResponseInput ? (
                   <button
                     onClick={() => setShowResponseInput(true)}
-                    className="w-full bg-orange-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-orange-600 transition-all flex items-center justify-center gap-2"
+                    className="w-full bg-blue-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-blue-600 transition-all flex items-center justify-center gap-2"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -298,7 +298,7 @@ export function NeedDetailScreen() {
                       placeholder="Contale brevemente cómo podés ayudar..."
                       value={responseMessage}
                       onChange={(e) => setResponseMessage(e.target.value)}
-                      className="w-full p-3 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 resize-none"
+                      className="w-full p-3 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none"
                       rows={3}
                       autoFocus
                     />
@@ -312,7 +312,7 @@ export function NeedDetailScreen() {
                       <button
                         onClick={handleRespond}
                         disabled={!responseMessage.trim() || isSending}
-                        className="flex-1 bg-orange-500 text-white py-3 rounded-xl text-sm font-semibold hover:bg-orange-600 disabled:opacity-50 transition-all"
+                        className="flex-1 bg-blue-500 text-white py-3 rounded-xl text-sm font-semibold hover:bg-blue-600 disabled:opacity-50 transition-all"
                       >
                         {isSending ? 'Enviando...' : 'Enviar respuesta'}
                       </button>
@@ -329,7 +329,7 @@ export function NeedDetailScreen() {
           <div className="sticky bottom-0 bg-background pt-4 pb-2 -mx-4 px-4 border-t">
             <button
               onClick={handleOpenChat}
-              className="w-full bg-orange-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-orange-600 transition-all flex items-center justify-center gap-2"
+              className="w-full bg-blue-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-blue-600 transition-all flex items-center justify-center gap-2"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />

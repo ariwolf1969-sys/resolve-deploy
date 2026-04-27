@@ -72,8 +72,8 @@ export function ChatListScreen() {
           </div>
         ) : threads.length === 0 ? (
           <div className="text-center py-20">
-            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
             </div>
@@ -91,13 +91,13 @@ export function ChatListScreen() {
                 className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors text-left"
               >
                 <div className="relative">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center">
                     <span className="text-lg font-bold text-white">
                       {thread.otherUser.name.charAt(0)}
                     </span>
                   </div>
                   {thread.unreadCount && thread.unreadCount > 0 && (
-                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
+                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
                       <span className="text-[10px] font-bold text-white">{thread.unreadCount}</span>
                     </div>
                   )}
@@ -110,7 +110,7 @@ export function ChatListScreen() {
                     </span>
                   </div>
                   {thread.need && (
-                    <p className="text-[10px] text-orange-500 font-medium truncate">
+                    <p className="text-[10px] text-blue-500 font-medium truncate">
                       {thread.need.title}
                     </p>
                   )}
@@ -215,7 +215,7 @@ export function ChatScreen() {
               <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
             </svg>
           </button>
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center">
             <span className="text-sm font-bold text-white">{otherUser?.name?.charAt(0) || '?'}</span>
           </div>
           <div className="flex-1 min-w-0">
@@ -230,7 +230,7 @@ export function ChatScreen() {
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
         {isLoading ? (
           <div className="flex justify-center py-8">
-            <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : messages.length === 0 ? (
           <div className="text-center py-12">
@@ -244,13 +244,13 @@ export function ChatScreen() {
               <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
                 <div className={`flex items-end gap-2 max-w-[80%] ${isMine ? 'flex-row-reverse' : ''}`}>
                   {!isMine && showAvatar && (
-                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center shrink-0">
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center shrink-0">
                       <span className="text-[10px] font-bold text-white">{msg.sender.name.charAt(0)}</span>
                     </div>
                   )}
                   {!isMine && !showAvatar && <div className="w-7 shrink-0" />}
                   <div>
-                    <div className={`px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed ${isMine ? 'bg-orange-500 text-white rounded-br-md' : 'bg-muted rounded-bl-md'}`}>
+                    <div className={`px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed ${isMine ? 'bg-blue-500 text-white rounded-br-md' : 'bg-muted rounded-bl-md'}`}>
                       {msg.content}
                     </div>
                     <p className={`text-[10px] text-muted-foreground mt-0.5 ${isMine ? 'text-right' : 'text-left'}`}>
@@ -274,14 +274,14 @@ export function ChatScreen() {
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyDown={handleKeyDown}
               rows={1}
-              className="w-full p-3 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 resize-none max-h-24"
+              className="w-full p-3 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none max-h-24"
               style={{ minHeight: '44px' }}
             />
           </div>
           <button
             onClick={handleSend}
             disabled={!newMessage.trim()}
-            className="w-11 h-11 bg-orange-500 rounded-xl flex items-center justify-center shrink-0 hover:bg-orange-600 disabled:opacity-50 transition-all active:scale-95"
+            className="w-11 h-11 bg-blue-500 rounded-xl flex items-center justify-center shrink-0 hover:bg-blue-600 disabled:opacity-50 transition-all active:scale-95"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
               <path d="m5 12 7-7 7 7" /><path d="M12 19V5" />

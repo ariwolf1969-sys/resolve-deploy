@@ -342,7 +342,7 @@ function QuoteCard({ quote, otherUserLabel, onClick }: { quote: Quote; otherUser
       ? 'bg-red-500'
       : quote.status === 'cancelled'
       ? 'bg-gray-400'
-      : 'bg-orange-500';
+      : 'bg-blue-500';
 
   return (
     <button
@@ -378,7 +378,7 @@ function QuoteCard({ quote, otherUserLabel, onClick }: { quote: Quote; otherUser
           </p>
           <p className="text-[10px] text-muted-foreground">{otherUserLabel}</p>
         </div>
-        <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-orange-400 transition-colors shrink-0" />
+        <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-blue-400 transition-colors shrink-0" />
       </div>
 
       {/* Bottom row: date + expiry */}
@@ -488,7 +488,7 @@ export function QuotesScreen() {
                 <span
                   className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${
                     activeTab === 'received'
-                      ? 'bg-orange-100 text-orange-600'
+                      ? 'bg-blue-100 text-blue-600'
                       : 'bg-gray-200 text-gray-500'
                   }`}
                 >
@@ -509,7 +509,7 @@ export function QuotesScreen() {
                 <span
                   className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${
                     activeTab === 'sent'
-                      ? 'bg-orange-100 text-orange-600'
+                      ? 'bg-blue-100 text-blue-600'
                       : 'bg-gray-200 text-gray-500'
                   }`}
                 >
@@ -542,7 +542,7 @@ export function QuotesScreen() {
       {/* Floating Action Button */}
       <button
         onClick={handleCreateQuote}
-        className="fixed bottom-24 right-4 w-14 h-14 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 rounded-2xl shadow-lg shadow-orange-500/30 flex items-center justify-center transition-all active:scale-95 z-20 sm:right-[calc(50%-14rem)]"
+        className="fixed bottom-24 right-4 w-14 h-14 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 rounded-2xl shadow-lg shadow-blue-500/30 flex items-center justify-center transition-all active:scale-95 z-20 sm:right-[calc(50%-14rem)]"
         aria-label="Crear nuevo presupuesto"
       >
         <Plus className="h-6 w-6 text-white" />

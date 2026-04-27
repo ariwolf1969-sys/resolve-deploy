@@ -62,7 +62,7 @@ export function ProfessionalProfileScreen() {
 
       <div className="px-4 py-4 space-y-4">
         {/* Profile Header with Hourly Rate */}
-        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-5 text-white relative overflow-hidden">
+        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-5 text-white relative overflow-hidden">
           {/* Decorative */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
           <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
@@ -81,8 +81,8 @@ export function ProfessionalProfileScreen() {
                   </span>
                 )}
               </div>
-              <p className="text-orange-100 text-sm font-medium">{pro.profession || 'Profesional'}</p>
-              <p className="text-orange-100/70 text-xs mt-0.5 flex items-center gap-1">
+              <p className="text-blue-100 text-sm font-medium">{pro.profession || 'Profesional'}</p>
+              <p className="text-blue-100/70 text-xs mt-0.5 flex items-center gap-1">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
                 {pro.city ? `${pro.city}${pro.province ? `, ${getProvinceName(pro.province)}` : ''}` : pro.province ? getProvinceName(pro.province) : pro.location || pro.neighborhood || 'Argentina'}
               </p>
@@ -99,17 +99,17 @@ export function ProfessionalProfileScreen() {
           <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-white/20 relative z-10">
             <div className="text-center">
               <p className="text-xl font-bold">{pro.completedJobs}</p>
-              <p className="text-[10px] text-orange-100">Trabajos</p>
+              <p className="text-[10px] text-blue-100">Trabajos</p>
             </div>
             <div className="text-center border-x border-white/20">
               <div className="flex items-center justify-center gap-1">
                 <div className="flex">{renderStars(pro.ratingAvg)}</div>
               </div>
-              <p className="text-[10px] text-orange-100 mt-0.5">{pro.ratingAvg} ({pro.ratingCount})</p>
+              <p className="text-[10px] text-blue-100 mt-0.5">{pro.ratingAvg} ({pro.ratingCount})</p>
             </div>
             <div className="text-center">
               <p className="text-xl font-bold">{pro.experience || '-'}</p>
-              <p className="text-[10px] text-orange-100">Experiencia</p>
+              <p className="text-[10px] text-blue-100">Experiencia</p>
             </div>
           </div>
         </div>
@@ -145,8 +145,8 @@ export function ProfessionalProfileScreen() {
           <div className="bg-white border border-gray-100 rounded-2xl p-4">
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Ubicación y zona de trabajo</h3>
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-orange-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
+              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
               </div>
               <div>
                 <p className="text-sm font-semibold">{pro.city ? `${pro.city}` : ''}{pro.province ? `${pro.city ? ', ' : ''}${getProvinceName(pro.province)}` : ''}</p>
@@ -171,7 +171,7 @@ export function ProfessionalProfileScreen() {
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Servicios y habilidades</h3>
             <div className="flex flex-wrap gap-1.5">
               {pro.skills.split(',').map((skill, i) => (
-                <span key={i} className="px-2.5 py-1 rounded-lg bg-orange-50 text-xs text-orange-700 font-medium">{skill.trim()}</span>
+                <span key={i} className="px-2.5 py-1 rounded-lg bg-blue-50 text-xs text-blue-700 font-medium">{skill.trim()}</span>
               ))}
             </div>
           </div>
@@ -245,7 +245,7 @@ export function ProfessionalProfileScreen() {
           </div>
           <button
             onClick={handleContact}
-            className="w-full bg-orange-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-orange-600 transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20 active:scale-[0.98]"
+            className="w-full bg-blue-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-blue-600 transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 active:scale-[0.98]"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />

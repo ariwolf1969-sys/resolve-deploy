@@ -113,7 +113,7 @@ export function CreateQuoteScreen() {
         {/* Service Title */}
         <div>
           <label className="text-sm font-semibold mb-1.5 flex items-center gap-1.5 text-foreground">
-            <FileText className="h-4 w-4 text-orange-500" />
+            <FileText className="h-4 w-4 text-blue-500" />
             Título del servicio <span className="text-red-500">*</span>
           </label>
           <input
@@ -125,7 +125,7 @@ export function CreateQuoteScreen() {
               if (errors.title) setErrors((prev) => ({ ...prev, title: '' }));
             }}
             maxLength={100}
-            className={`w-full p-3.5 rounded-xl border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all ${
+            className={`w-full p-3.5 rounded-xl border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all ${
               errors.title ? 'border-red-300 bg-red-50/30' : 'border-gray-200'
             }`}
           />
@@ -144,7 +144,7 @@ export function CreateQuoteScreen() {
         {/* Detailed Description */}
         <div>
           <label className="text-sm font-semibold mb-1.5 flex items-center gap-1.5 text-foreground">
-            <MessageSquare className="h-4 w-4 text-orange-500" />
+            <MessageSquare className="h-4 w-4 text-blue-500" />
             Descripción detallada <span className="text-red-500">*</span>
           </label>
           <textarea
@@ -156,7 +156,7 @@ export function CreateQuoteScreen() {
             }}
             maxLength={500}
             rows={4}
-            className={`w-full p-3.5 rounded-xl border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all resize-none ${
+            className={`w-full p-3.5 rounded-xl border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none ${
               errors.description ? 'border-red-300 bg-red-50/30' : 'border-gray-200'
             }`}
           />
@@ -194,7 +194,7 @@ export function CreateQuoteScreen() {
         {/* Amount */}
         <div>
           <label className="text-sm font-semibold mb-1.5 flex items-center gap-1.5 text-foreground">
-            <DollarSign className="h-4 w-4 text-orange-500" />
+            <DollarSign className="h-4 w-4 text-blue-500" />
             Monto total <span className="text-red-500">*</span>
           </label>
           <div className="relative">
@@ -211,7 +211,7 @@ export function CreateQuoteScreen() {
               }}
               min="0"
               step="100"
-              className={`w-full pl-8 pr-16 p-3.5 rounded-xl border bg-background text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all ${
+              className={`w-full pl-8 pr-16 p-3.5 rounded-xl border bg-background text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all ${
                 errors.amount ? 'border-red-300 bg-red-50/30' : 'border-gray-200'
               }`}
             />
@@ -235,8 +235,8 @@ export function CreateQuoteScreen() {
         {/* Includes Materials */}
         <div className="flex items-center justify-between bg-gray-50 rounded-xl p-4 border border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center">
-              <Package className="h-5 w-5 text-orange-600" />
+            <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+              <Package className="h-5 w-5 text-blue-600" />
             </div>
             <div>
               <p className="text-sm font-semibold text-foreground">¿Incluye materiales?</p>
@@ -246,7 +246,7 @@ export function CreateQuoteScreen() {
           <button
             onClick={() => setIncludesMaterials(!includesMaterials)}
             className={`relative w-12 h-7 rounded-full transition-colors duration-200 ${
-              includesMaterials ? 'bg-orange-500' : 'bg-gray-300'
+              includesMaterials ? 'bg-blue-500' : 'bg-gray-300'
             }`}
             role="switch"
             aria-checked={includesMaterials}
@@ -262,7 +262,7 @@ export function CreateQuoteScreen() {
         {/* Estimated Hours */}
         <div>
           <label className="text-sm font-semibold mb-1.5 flex items-center gap-1.5 text-foreground">
-            <Clock className="h-4 w-4 text-orange-500" />
+            <Clock className="h-4 w-4 text-blue-500" />
             Horas estimadas <span className="text-red-500">*</span>
           </label>
           <div className="relative">
@@ -276,7 +276,7 @@ export function CreateQuoteScreen() {
               }}
               min="0.5"
               step="0.5"
-              className={`w-full p-3.5 pr-16 rounded-xl border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all ${
+              className={`w-full p-3.5 pr-16 rounded-xl border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all ${
                 errors.estimatedHours ? 'border-red-300 bg-red-50/30' : 'border-gray-200'
               }`}
             />
@@ -295,14 +295,14 @@ export function CreateQuoteScreen() {
         {/* Validity Period */}
         <div>
           <label className="text-sm font-semibold mb-1.5 flex items-center gap-1.5 text-foreground">
-            <Clock className="h-4 w-4 text-orange-500" />
+            <Clock className="h-4 w-4 text-blue-500" />
             Validez del presupuesto
           </label>
           <div className="relative">
             <button
               type="button"
               onClick={() => setShowValidityDropdown(!showValidityDropdown)}
-              className="w-full flex items-center justify-between p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+              className="w-full flex items-center justify-between p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
             >
               <span className="text-foreground font-medium">{selectedValidity?.label}</span>
               <ChevronDown
@@ -323,7 +323,7 @@ export function CreateQuoteScreen() {
                     }}
                     className={`w-full text-left px-4 py-3 text-sm transition-colors hover:bg-gray-50 ${
                       validity === option.value
-                        ? 'bg-orange-50 text-orange-600 font-semibold'
+                        ? 'bg-blue-50 text-blue-600 font-semibold'
                         : 'text-foreground'
                     }`}
                   >
@@ -338,7 +338,7 @@ export function CreateQuoteScreen() {
         {/* Client Message */}
         <div>
           <label className="text-sm font-semibold mb-1.5 flex items-center gap-1.5 text-foreground">
-            <MessageSquare className="h-4 w-4 text-orange-500" />
+            <MessageSquare className="h-4 w-4 text-blue-500" />
             Mensaje para el cliente
           </label>
           <textarea
@@ -347,7 +347,7 @@ export function CreateQuoteScreen() {
             onChange={(e) => setClientMessage(e.target.value)}
             maxLength={300}
             rows={3}
-            className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all resize-none"
+            className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
           />
           <p className="text-[10px] text-muted-foreground mt-1">{clientMessage.length}/300</p>
         </div>
@@ -355,7 +355,7 @@ export function CreateQuoteScreen() {
         {/* Client ID */}
         <div>
           <label className="text-sm font-semibold mb-1.5 flex items-center gap-1.5 text-foreground">
-            <User className="h-4 w-4 text-orange-500" />
+            <User className="h-4 w-4 text-blue-500" />
             ID del cliente <span className="text-red-500">*</span>
             <span className="text-[10px] text-muted-foreground font-normal">(demo)</span>
           </label>
@@ -367,7 +367,7 @@ export function CreateQuoteScreen() {
               setClientId(e.target.value);
               if (errors.clientId) setErrors((prev) => ({ ...prev, clientId: '' }));
             }}
-            className={`w-full p-3.5 rounded-xl border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all ${
+            className={`w-full p-3.5 rounded-xl border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all ${
               errors.clientId ? 'border-red-300 bg-red-50/30' : 'border-gray-200'
             }`}
           />
@@ -381,8 +381,8 @@ export function CreateQuoteScreen() {
 
         {/* Summary Card */}
         {title && amount && parseFloat(amount) > 0 && (
-          <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4">
-            <h4 className="text-xs font-semibold text-orange-700 mb-3 uppercase tracking-wide">
+          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4">
+            <h4 className="text-xs font-semibold text-blue-700 mb-3 uppercase tracking-wide">
               Resumen del presupuesto
             </h4>
             <div className="space-y-2">
@@ -392,7 +392,7 @@ export function CreateQuoteScreen() {
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Monto</span>
-                <span className="font-bold text-orange-600">
+                <span className="font-bold text-blue-600">
                   {new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(parseFloat(amount))}
                 </span>
               </div>
@@ -418,7 +418,7 @@ export function CreateQuoteScreen() {
         <button
           onClick={handleSubmit}
           disabled={!isValid || isSubmitting}
-          className="w-full bg-orange-500 text-white py-4 rounded-xl font-semibold text-sm hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2"
+          className="w-full bg-blue-500 text-white py-4 rounded-xl font-semibold text-sm hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
             <>

@@ -118,7 +118,7 @@ function EditProfileScreen() {
           <textarea defaultValue={currentUser?.bio || ''} className="w-full p-3 rounded-lg border bg-background text-sm min-h-[100px]" rows={3} id="edit-bio" />
         </div>
       </div>
-      <button onClick={() => setView('profile')} className="w-full mt-6 bg-orange-500 text-white py-3 rounded-xl font-semibold text-sm hover:bg-orange-600 transition-colors">Guardar cambios</button>
+      <button onClick={() => setView('profile')} className="w-full mt-6 bg-blue-500 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-600 transition-colors">Guardar cambios</button>
     </div>
   );
 }
@@ -129,7 +129,7 @@ function ProductDetailScreen() {
     return (
       <div className="min-h-full p-4 flex flex-col items-center justify-center">
         <p className="text-muted-foreground">Producto no encontrado</p>
-        <button onClick={() => goBack()} className="mt-4 text-orange-500 font-medium">Volver</button>
+        <button onClick={() => goBack()} className="mt-4 text-blue-500 font-medium">Volver</button>
       </div>
     );
   }
@@ -139,7 +139,7 @@ function ProductDetailScreen() {
     : 0;
 
   const sourceColors: Record<string, string> = {
-    amazon: 'bg-orange-100 text-orange-700 border-orange-200',
+    amazon: 'bg-blue-100 text-blue-700 border-blue-200',
     ebay: 'bg-blue-100 text-blue-700 border-blue-200',
     mercadolibre: 'bg-yellow-100 text-yellow-700 border-yellow-200',
     aliexpress: 'bg-red-100 text-red-700 border-red-200',
@@ -233,16 +233,16 @@ function ProductDetailScreen() {
         )}
 
         {/* Commission Info */}
-        <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-1">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <circle cx="12" cy="12" r="10" />
               <path d="M12 16v-4" />
               <path d="M12 8h.01" />
             </svg>
-            <span className="text-sm font-medium text-orange-700">Precio de afiliado</span>
+            <span className="text-sm font-medium text-blue-700">Precio de afiliado</span>
           </div>
-          <p className="text-xs text-orange-600">Este precio incluye una comisión de {selectedProduct.commission}% por la derivación de ventas.</p>
+          <p className="text-xs text-blue-600">Este precio incluye una comisión de {selectedProduct.commission}% por la derivación de ventas.</p>
         </div>
 
         {/* CTA Buttons */}
@@ -251,7 +251,7 @@ function ProductDetailScreen() {
             href={selectedProduct.sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full bg-orange-500 text-white py-3.5 rounded-xl font-semibold text-center flex items-center justify-center gap-2 hover:bg-orange-600 transition-colors"
+            className="w-full bg-blue-500 text-white py-3.5 rounded-xl font-semibold text-center flex items-center justify-center gap-2 hover:bg-blue-600 transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />

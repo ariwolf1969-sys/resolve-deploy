@@ -82,7 +82,7 @@ export function SearchOverlay() {
               placeholder="Ej: electricistas, plomeros, albañiles..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               autoFocus
             />
           </div>
@@ -101,7 +101,7 @@ export function SearchOverlay() {
                 onClick={() => setSortBy(opt.key)}
                 className={`px-3 py-1.5 rounded-lg text-[10px] font-semibold whitespace-nowrap transition-all ${
                   sortBy === opt.key
-                    ? 'bg-orange-500 text-white shadow-sm'
+                    ? 'bg-blue-500 text-white shadow-sm'
                     : 'bg-muted text-muted-foreground hover:bg-gray-200'
                 }`}
               >
@@ -119,7 +119,7 @@ export function SearchOverlay() {
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
             <span>Filtrar por ubicación</span>
-            {selectedProvince && <span className="px-1.5 py-0.5 rounded bg-orange-100 text-orange-600 text-[9px]">Activo</span>}
+            {selectedProvince && <span className="px-1.5 py-0.5 rounded bg-blue-100 text-blue-600 text-[9px]">Activo</span>}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className={`h-3.5 w-3.5 transition-transform ${showLocationFilter ? 'rotate-180' : ''}`}
@@ -138,7 +138,7 @@ export function SearchOverlay() {
               <select
                 value={selectedProvince}
                 onChange={(e) => setSelectedProvince(e.target.value)}
-                className="w-full p-2.5 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                className="w-full p-2.5 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               >
                 <option value="">Todas las provincias</option>
                 {ARGENTINA_PROVINCES.map(p => (
@@ -151,7 +151,7 @@ export function SearchOverlay() {
                 <select
                   value={selectedCity}
                   onChange={(e) => setSelectedCity(e.target.value)}
-                  className="w-full p-2.5 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                  className="w-full p-2.5 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 >
                   <option value="">Todas las ciudades</option>
                   {getCitiesByProvince(selectedProvince).map(c => (
@@ -169,7 +169,7 @@ export function SearchOverlay() {
                       onClick={() => setSelectedWorkZone(selectedWorkZone === zone ? '' : zone)}
                       className={`px-3 py-1.5 rounded-lg text-[10px] font-semibold transition-all ${
                         selectedWorkZone === zone
-                          ? 'bg-orange-500 text-white shadow-sm'
+                          ? 'bg-blue-500 text-white shadow-sm'
                           : 'bg-muted text-muted-foreground hover:bg-gray-200'
                       }`}
                     >
@@ -199,7 +199,7 @@ export function SearchOverlay() {
                 <button
                   key={p.id}
                   onClick={() => handleProfessionClick(p.name)}
-                  className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-gray-100 bg-white hover:shadow-sm hover:border-orange-200 transition-all active:scale-95"
+                  className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-gray-100 bg-white hover:shadow-sm hover:border-blue-200 transition-all active:scale-95"
                 >
                   <span className="text-2xl">{p.icon}</span>
                   <span className="text-[10px] font-medium text-center leading-tight">{p.name}</span>
@@ -209,12 +209,12 @@ export function SearchOverlay() {
           </div>
         ) : isSearching ? (
           <div className="flex justify-center py-12">
-            <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : sortedProfessionals.length === 0 ? (
           <div className="text-center py-12">
-            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
             </div>
             <h3 className="font-semibold mb-1">Sin resultados</h3>
             <p className="text-sm text-muted-foreground">No encontramos profesionales para &quot;{query}&quot;</p>
@@ -249,7 +249,7 @@ function ProfessionalCard({ pro, onClick }: { pro: User; onClick: () => void }) 
       <div className="flex items-start gap-3">
         {/* Avatar */}
         <div className="relative shrink-0">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-md">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-md">
             <span className="text-xl font-bold text-white">{pro.name.charAt(0)}</span>
           </div>
           {pro.available && (
@@ -270,7 +270,7 @@ function ProfessionalCard({ pro, onClick }: { pro: User; onClick: () => void }) 
           </div>
 
           {/* Profession */}
-          <p className="text-xs font-medium text-orange-600 mt-0.5">{pro.profession}</p>
+          <p className="text-xs font-medium text-blue-600 mt-0.5">{pro.profession}</p>
 
           {/* Rating + jobs */}
           <div className="flex items-center gap-3 mt-1.5">
@@ -309,7 +309,7 @@ function ProfessionalCard({ pro, onClick }: { pro: User; onClick: () => void }) 
             <span key={i} className="px-2 py-0.5 rounded-md bg-gray-50 text-[9px] text-muted-foreground font-medium">{skill.trim()}</span>
           ))}
           {pro.skills.split(',').length > 4 && (
-            <span className="px-2 py-0.5 rounded-md bg-orange-50 text-[9px] text-orange-500 font-medium">+{pro.skills.split(',').length - 4}</span>
+            <span className="px-2 py-0.5 rounded-md bg-blue-50 text-[9px] text-blue-500 font-medium">+{pro.skills.split(',').length - 4}</span>
           )}
         </div>
       )}

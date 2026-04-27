@@ -132,7 +132,7 @@ function getDiscountPercent(price: number, originalPrice?: number): number | nul
 function getSourceBadgeStyles(source: string): string {
   const s = source.toLowerCase();
   if (s.includes('mercadolibre') || s.includes('ml')) return 'bg-yellow-500/10 text-yellow-700 border-yellow-200';
-  if (s.includes('amazon')) return 'bg-orange-500/10 text-orange-700 border-orange-200';
+  if (s.includes('amazon')) return 'bg-blue-500/10 text-blue-700 border-blue-200';
   if (s.includes('ebay')) return 'bg-blue-500/10 text-blue-700 border-blue-200';
   if (s.includes('aliexpress') || s.includes('ali')) return 'bg-red-500/10 text-red-700 border-red-200';
   if (s.includes('temu')) return 'bg-purple-500/10 text-purple-700 border-purple-200';
@@ -143,7 +143,7 @@ function getSourceBadgeStyles(source: string): string {
 function getSourceDotColor(source: string): string {
   const s = source.toLowerCase();
   if (s.includes('mercadolibre') || s.includes('ml')) return 'bg-yellow-500';
-  if (s.includes('amazon')) return 'bg-orange-500';
+  if (s.includes('amazon')) return 'bg-blue-500';
   if (s.includes('ebay')) return 'bg-blue-600';
   if (s.includes('aliexpress') || s.includes('ali')) return 'bg-red-500';
   if (s.includes('temu')) return 'bg-purple-600';
@@ -370,7 +370,7 @@ function ProductCard({
         )}
 
         {product.featured && (
-          <div className="absolute top-2 right-2 bg-orange-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md shadow-sm">
+          <div className="absolute top-2 right-2 bg-blue-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md shadow-sm">
             ★ TOP
           </div>
         )}
@@ -428,7 +428,7 @@ function ProductCard({
         {/* CTA Button */}
         <button
           onClick={() => onClick(product)}
-          className="mt-2.5 w-full flex items-center justify-center gap-1.5 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white text-xs font-semibold py-2 rounded-lg transition-colors"
+          className="mt-2.5 w-full flex items-center justify-center gap-1.5 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white text-xs font-semibold py-2 rounded-lg transition-colors"
         >
           Ver oferta
           <ExternalLink className="h-3 w-3" />
@@ -573,7 +573,7 @@ export function ProductsScreen() {
               </button>
               <button
                 onClick={toggleFilters}
-                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${showFiltersRef.current ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${showFiltersRef.current ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                 aria-label="Filtros"
               >
                 <Filter className="h-4 w-4" />
@@ -590,7 +590,7 @@ export function ProductsScreen() {
               value={productSearchQuery}
               onChange={(e) => setProductSearchQuery(e.target.value)}
               placeholder="Buscar productos, marcas..."
-              className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-gray-100 border-none text-sm text-foreground placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:bg-white transition-all"
+              className="w-full pl-9 pr-9 py-2.5 rounded-xl bg-gray-100 border-none text-sm text-foreground placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:bg-white transition-all"
             />
             {productSearchQuery && (
               <button
@@ -656,7 +656,7 @@ export function ProductsScreen() {
             {filteredProducts.length === 1 ? 'resultado' : 'resultados'}
             {isOnline && <span className="ml-1">de {totalProducts}</span>}
           </p>
-          <button onClick={handleClearAllFilters} className="flex items-center gap-1 text-xs text-orange-500 font-semibold hover:text-orange-600 transition-colors">
+          <button onClick={handleClearAllFilters} className="flex items-center gap-1 text-xs text-blue-500 font-semibold hover:text-blue-600 transition-colors">
             Limpiar filtros <ChevronRight className="h-3 w-3" />
           </button>
         </div>

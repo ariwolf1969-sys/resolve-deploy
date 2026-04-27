@@ -236,7 +236,7 @@ function TimelineSection({ steps }: { steps: TimelineStep[] }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-4">
       <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
-        <Clock className="h-4 w-4 text-orange-500" />
+        <Clock className="h-4 w-4 text-blue-500" />
         Estado del trabajo
       </h3>
       <div className="space-y-0">
@@ -249,7 +249,7 @@ function TimelineSection({ steps }: { steps: TimelineStep[] }) {
                   step.completed
                     ? 'bg-emerald-500 border-emerald-500'
                     : step.current
-                    ? 'bg-orange-500 border-orange-500 ring-4 ring-orange-500/20'
+                    ? 'bg-blue-500 border-blue-500 ring-4 ring-blue-500/20'
                     : 'bg-white border-gray-300'
                 }`}
               >
@@ -278,7 +278,7 @@ function TimelineSection({ steps }: { steps: TimelineStep[] }) {
                   step.completed
                     ? 'text-foreground'
                     : step.current
-                    ? 'text-orange-600'
+                    ? 'text-blue-600'
                     : 'text-muted-foreground'
                 }`}
               >
@@ -307,7 +307,7 @@ function TransactionSection({ quote }: { quote: Quote }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-4">
       <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
-        <Lock className="h-4 w-4 text-orange-500" />
+        <Lock className="h-4 w-4 text-blue-500" />
         Transacción & Pago
       </h3>
 
@@ -395,7 +395,7 @@ function CheckInSection({ quote }: { quote: Quote }) {
       case 'arrival':
         return { label: 'Llegada al domicilio', color: 'bg-blue-500' };
       case 'start':
-        return { label: 'Inicio del trabajo', color: 'bg-orange-500' };
+        return { label: 'Inicio del trabajo', color: 'bg-blue-500' };
       case 'progress':
         return { label: 'Progreso', color: 'bg-purple-500' };
       case 'completion':
@@ -408,7 +408,7 @@ function CheckInSection({ quote }: { quote: Quote }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 p-4">
       <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
-        <MapPin className="h-4 w-4 text-orange-500" />
+        <MapPin className="h-4 w-4 text-blue-500" />
         Registro de actividad
       </h3>
 
@@ -577,8 +577,8 @@ export function QuoteDetailScreen() {
           {/* Title */}
           <div>
             <div className="flex items-start gap-3 mb-2">
-              <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center shrink-0 mt-0.5">
-                <FileText className="h-5 w-5 text-orange-600" />
+              <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
+                <FileText className="h-5 w-5 text-blue-600" />
               </div>
               <div>
                 <h2 className="text-base font-bold text-foreground leading-snug">{quote.title}</h2>
@@ -591,18 +591,18 @@ export function QuoteDetailScreen() {
           </div>
 
           {/* Amount */}
-          <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-4 border border-orange-100">
-            <p className="text-xs text-orange-600 font-medium mb-1">Monto total</p>
-            <p className="text-2xl font-bold text-orange-600">{formatARS(quote.amount)}</p>
+          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-100">
+            <p className="text-xs text-blue-600 font-medium mb-1">Monto total</p>
+            <p className="text-2xl font-bold text-blue-600">{formatARS(quote.amount)}</p>
             <div className="flex items-center gap-3 mt-2">
               {quote.includesMaterials && (
-                <span className="inline-flex items-center gap-1 text-[11px] bg-white/80 text-orange-700 px-2 py-0.5 rounded-full font-medium">
+                <span className="inline-flex items-center gap-1 text-[11px] bg-white/80 text-blue-700 px-2 py-0.5 rounded-full font-medium">
                   <Package className="h-3 w-3" />
                   Materiales incluidos
                 </span>
               )}
               {quote.estimatedHours && (
-                <span className="inline-flex items-center gap-1 text-[11px] bg-white/80 text-orange-700 px-2 py-0.5 rounded-full font-medium">
+                <span className="inline-flex items-center gap-1 text-[11px] bg-white/80 text-blue-700 px-2 py-0.5 rounded-full font-medium">
                   <Clock className="h-3 w-3" />
                   {quote.estimatedHours}h estimadas
                 </span>
@@ -625,7 +625,7 @@ export function QuoteDetailScreen() {
             </h3>
             <div className="flex items-center gap-3">
               <Avatar className="h-11 w-11">
-                <AvatarFallback className="text-sm font-bold text-white bg-orange-500">
+                <AvatarFallback className="text-sm font-bold text-white bg-blue-500">
                   {getInitials(quote.provider.name)}
                 </AvatarFallback>
               </Avatar>
@@ -693,7 +693,7 @@ export function QuoteDetailScreen() {
               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
                 Mensaje del cliente
               </h3>
-              <div className="bg-orange-50 rounded-xl p-3 text-sm text-foreground leading-relaxed">
+              <div className="bg-blue-50 rounded-xl p-3 text-sm text-foreground leading-relaxed">
                 {quote.clientMessage}
               </div>
             </div>
@@ -772,7 +772,7 @@ export function QuoteDetailScreen() {
             {showClientConfirmArrival && !showReleasePayment && (
               <button
                 onClick={() => setView('check-in')}
-                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 transition-all active:scale-[0.98] shadow-lg shadow-orange-500/20"
+                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-all active:scale-[0.98] shadow-lg shadow-blue-500/20"
               >
                 <MapPin className="h-4 w-4" />
                 El profesional llegó a mi domicilio
@@ -783,7 +783,7 @@ export function QuoteDetailScreen() {
             {showProviderCheckIn && (
               <button
                 onClick={() => setView('check-in')}
-                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 transition-all active:scale-[0.98] shadow-lg shadow-orange-500/20"
+                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-all active:scale-[0.98] shadow-lg shadow-blue-500/20"
               >
                 <MapPin className="h-4 w-4" />
                 Registrar llegada
@@ -814,7 +814,7 @@ export function QuoteDetailScreen() {
             {showRate && (
               <button
                 onClick={() => setView('quotes')}
-                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 transition-all active:scale-[0.98] shadow-lg shadow-orange-500/20"
+                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-all active:scale-[0.98] shadow-lg shadow-blue-500/20"
               >
                 <Star className="h-4 w-4" />
                 Calificar servicio

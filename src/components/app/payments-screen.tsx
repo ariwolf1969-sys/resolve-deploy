@@ -156,9 +156,9 @@ function getStatusConfig(status: string) {
     case 'disputed':
       return {
         label: 'En disputa',
-        bg: 'bg-orange-50',
-        border: 'border-orange-200',
-        text: 'text-orange-700',
+        bg: 'bg-blue-50',
+        border: 'border-blue-200',
+        text: 'text-blue-700',
         icon: AlertTriangle,
       };
     default:
@@ -181,7 +181,7 @@ function getPaymentMethodBadge(method: string) {
     case 'transfer':
       return { label: 'Transferencia', icon: Banknote, color: 'text-green-600 bg-green-50' };
     case 'wallet':
-      return { label: 'Billetera virtual', icon: Smartphone, color: 'text-orange-600 bg-orange-50' };
+      return { label: 'Billetera virtual', icon: Smartphone, color: 'text-blue-600 bg-blue-50' };
     default:
       return { label: method, icon: CreditCard, color: 'text-gray-600 bg-gray-50' };
   }
@@ -232,8 +232,8 @@ export function PaymentsScreen() {
             <h1 className="text-lg font-bold text-gray-900">Mis Pagos</h1>
             <p className="text-[11px] text-gray-400 -mt-0.5">Historial de transacciones</p>
           </div>
-          <div className="p-2 rounded-xl bg-orange-50">
-            <Shield className="h-5 w-5 text-orange-500" />
+          <div className="p-2 rounded-xl bg-blue-50">
+            <Shield className="h-5 w-5 text-blue-500" />
           </div>
         </div>
       </div>
@@ -271,14 +271,14 @@ export function PaymentsScreen() {
         </div>
 
         {/* Escrow Info Banner */}
-        <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl p-3.5 border border-orange-100">
+        <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-3.5 border border-blue-100">
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-xl bg-orange-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <Shield className="h-4 w-4 text-orange-600" />
+            <div className="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <Shield className="h-4 w-4 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-orange-800">Pago protegido con Escrow</p>
-              <p className="text-xs text-orange-600/80 mt-0.5 leading-relaxed">
+              <p className="text-sm font-semibold text-blue-800">Pago protegido con Escrow</p>
+              <p className="text-xs text-blue-600/80 mt-0.5 leading-relaxed">
                 Tu dinero se retiene de forma segura hasta que confirmes que el trabajo fue realizado correctamente.
               </p>
             </div>
@@ -293,7 +293,7 @@ export function PaymentsScreen() {
               onClick={() => setActiveTab(tab.key)}
               className={`flex-1 py-2 px-2 rounded-xl text-xs font-semibold transition-all ${
                 activeTab === tab.key
-                  ? 'bg-orange-500 text-white shadow-md shadow-orange-500/25'
+                  ? 'bg-blue-500 text-white shadow-md shadow-blue-500/25'
                   : 'text-gray-500 hover:bg-gray-50'
               }`}
             >
@@ -349,7 +349,7 @@ export function PaymentsScreen() {
 
                     {/* Counterparty */}
                     <div className="flex items-center gap-1.5 mb-2">
-                      <div className="w-5 h-5 rounded-full bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center">
+                      <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center">
                         <span className="text-[9px] font-bold text-white">
                           {txn.counterparty.charAt(0)}
                         </span>
@@ -396,7 +396,7 @@ export function PaymentsScreen() {
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-xs text-gray-500">Comisión plataforma (8%)</span>
-                          <span className="text-sm font-semibold text-orange-600">
+                          <span className="text-sm font-semibold text-blue-600">
                             - {formatCurrency(txn.platformFee)}
                           </span>
                         </div>
@@ -427,8 +427,8 @@ export function PaymentsScreen() {
                           </div>
                         )}
                         <div className="flex items-center gap-1.5 pt-1">
-                          <Shield className="h-3 w-3 text-orange-400" />
-                          <span className="text-[10px] text-orange-500 font-medium">
+                          <Shield className="h-3 w-3 text-blue-400" />
+                          <span className="text-[10px] text-blue-500 font-medium">
                             Transacción protegida por escrow
                           </span>
                         </div>

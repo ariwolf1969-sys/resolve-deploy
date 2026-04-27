@@ -35,7 +35,7 @@ const DEMO_PRODUCTS = [
     price: 89900,
     originalPrice: 129900,
     source: 'MercadoLibre',
-    image: 'https://placehold.co/400x300/f97316/ffffff?text=Taladro+20V',
+    image: 'https://placehold.co/400x300/3b82f6/ffffff?text=Taladro+20V',
     rating: 4.7,
     reviews: 342,
   },
@@ -45,7 +45,7 @@ const DEMO_PRODUCTS = [
     price: 45900,
     originalPrice: 59900,
     source: 'Amazon',
-    image: 'https://placehold.co/400x300/ea580c/ffffff?text=Kit+Herramientas',
+    image: 'https://placehold.co/400x300/2563eb/ffffff?text=Kit+Herramientas',
     rating: 4.5,
     reviews: 189,
   },
@@ -76,7 +76,7 @@ const SOURCE_BADGES = [
   { name: 'eBay', color: 'bg-blue-50 text-blue-700 border-blue-200' },
   { name: 'MercadoLibre', color: 'bg-yellow-100 text-yellow-800 border-yellow-200' },
   { name: 'AliExpress', color: 'bg-red-50 text-red-700 border-red-200' },
-  { name: 'Temu', color: 'bg-orange-50 text-orange-700 border-orange-200' },
+  { name: 'Temu', color: 'bg-blue-50 text-blue-700 border-blue-200' },
   { name: 'SHEIN', color: 'bg-pink-50 text-pink-700 border-pink-200' },
 ];
 
@@ -100,10 +100,10 @@ export function WebLandingScreen() {
   return (
     <div className="min-h-screen bg-white">
       {/* ──────────────── 1. HERO SECTION ──────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-orange-500 via-orange-500 to-amber-500">
+      <section className="relative overflow-hidden bg-gradient-to-br from-blue-500 via-blue-500 to-cyan-500">
         {/* Decorative blobs */}
-        <div className="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-orange-400/30 blur-3xl" />
-        <div className="absolute -bottom-32 -left-32 h-[400px] w-[400px] rounded-full bg-amber-400/30 blur-3xl" />
+        <div className="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-blue-400/30 blur-3xl" />
+        <div className="absolute -bottom-32 -left-32 h-[400px] w-[400px] rounded-full bg-cyan-400/30 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-20 sm:px-6 sm:pb-24 sm:pt-28 lg:px-8 lg:pb-32 lg:pt-36">
           {/* Nav bar */}
@@ -132,7 +132,7 @@ export function WebLandingScreen() {
             <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
               Resolvé
             </h1>
-            <p className="mt-4 text-lg leading-relaxed text-orange-100 sm:mt-6 sm:text-xl lg:text-2xl">
+            <p className="mt-4 text-lg leading-relaxed text-blue-100 sm:mt-6 sm:text-xl lg:text-2xl">
               La plataforma que conecta lo que necesitás con quien puede hacerlo
             </p>
 
@@ -140,7 +140,7 @@ export function WebLandingScreen() {
             <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center sm:gap-4">
               <Button
                 size="lg"
-                className="h-12 w-full bg-white px-8 text-base font-semibold text-orange-600 shadow-lg hover:bg-orange-50 sm:w-auto"
+                className="h-12 w-full bg-white px-8 text-base font-semibold text-blue-600 shadow-lg hover:bg-blue-50 sm:w-auto"
                 onClick={() => setView('home')}
               >
                 <Download className="mr-2 h-5 w-5" />
@@ -161,17 +161,17 @@ export function WebLandingScreen() {
           {/* Stats bar */}
           <div className="mt-16 flex flex-col items-center justify-center gap-4 rounded-2xl bg-white/10 p-4 backdrop-blur-sm sm:flex-row sm:gap-8 sm:px-8 sm:py-5">
             <div className="flex items-center gap-2 text-white">
-              <Users className="h-5 w-5 text-orange-200" />
+              <Users className="h-5 w-5 text-blue-200" />
               <span className="text-sm font-semibold sm:text-base">+500 Profesionales</span>
             </div>
             <div className="hidden h-4 w-px bg-white/30 sm:block" />
             <div className="flex items-center gap-2 text-white">
-              <Zap className="h-5 w-5 text-orange-200" />
+              <Zap className="h-5 w-5 text-blue-200" />
               <span className="text-sm font-semibold sm:text-base">+10.000 Servicios</span>
             </div>
             <div className="hidden h-4 w-px bg-white/30 sm:block" />
             <div className="flex items-center gap-2 text-white">
-              <MapPin className="h-5 w-5 text-orange-200" />
+              <MapPin className="h-5 w-5 text-blue-200" />
               <span className="text-sm font-semibold sm:text-base">24 Provincias</span>
             </div>
           </div>
@@ -194,10 +194,10 @@ export function WebLandingScreen() {
             {/* Step 1 */}
             <div className="group relative rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200/60 transition-all hover:shadow-md sm:p-8">
               <div className="mb-5 flex items-center gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-orange-100 text-xl font-bold text-orange-600">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xl font-bold text-blue-600">
                   1
                 </div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-500 transition-colors group-hover:bg-orange-500 group-hover:text-white">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-500 transition-colors group-hover:bg-blue-500 group-hover:text-white">
                   <Search className="h-5 w-5" />
                 </div>
               </div>
@@ -210,10 +210,10 @@ export function WebLandingScreen() {
             {/* Step 2 */}
             <div className="group relative rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200/60 transition-all hover:shadow-md sm:p-8">
               <div className="mb-5 flex items-center gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-orange-100 text-xl font-bold text-orange-600">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xl font-bold text-blue-600">
                   2
                 </div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-500 transition-colors group-hover:bg-orange-500 group-hover:text-white">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-500 transition-colors group-hover:bg-blue-500 group-hover:text-white">
                   <FileText className="h-5 w-5" />
                 </div>
               </div>
@@ -226,10 +226,10 @@ export function WebLandingScreen() {
             {/* Step 3 */}
             <div className="group relative rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200/60 transition-all hover:shadow-md sm:p-8 sm:col-span-2 lg:col-span-1">
               <div className="mb-5 flex items-center gap-4">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-orange-100 text-xl font-bold text-orange-600">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xl font-bold text-blue-600">
                   3
                 </div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-500 transition-colors group-hover:bg-orange-500 group-hover:text-white">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-500 transition-colors group-hover:bg-blue-500 group-hover:text-white">
                   <Lock className="h-5 w-5" />
                 </div>
               </div>
@@ -308,7 +308,7 @@ export function WebLandingScreen() {
 
                   {/* Price */}
                   <div className="mt-3 flex items-baseline gap-2">
-                    <span className="text-lg font-bold text-orange-600">{formatPrice(product.price)}</span>
+                    <span className="text-lg font-bold text-blue-600">{formatPrice(product.price)}</span>
                     {product.originalPrice && (
                       <span className="text-xs text-gray-400 line-through">
                         {formatPrice(product.originalPrice)}
@@ -317,7 +317,7 @@ export function WebLandingScreen() {
                   </div>
 
                   <Button
-                    className="mt-4 h-9 w-full bg-orange-500 text-xs font-semibold text-white hover:bg-orange-600"
+                    className="mt-4 h-9 w-full bg-blue-500 text-xs font-semibold text-white hover:bg-blue-600"
                     onClick={() => setView('products')}
                   >
                     Ver oferta
@@ -332,7 +332,7 @@ export function WebLandingScreen() {
           <div className="mt-10 text-center">
             <Button
               variant="ghost"
-              className="text-sm font-semibold text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+              className="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:bg-blue-50"
               onClick={() => setView('products')}
             >
               Ver todos los productos
@@ -346,8 +346,8 @@ export function WebLandingScreen() {
       <section className="bg-gray-50 py-16 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-100">
-              <Shield className="h-7 w-7 text-orange-500" />
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100">
+              <Shield className="h-7 w-7 text-blue-500" />
             </div>
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
               Pagos 100% seguros
@@ -360,8 +360,8 @@ export function WebLandingScreen() {
           <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 sm:mt-16">
             {/* Pillar 1 */}
             <div className="group rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-gray-200/60 transition-all hover:shadow-md sm:p-8">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 transition-colors group-hover:bg-orange-500">
-                <Lock className="h-7 w-7 text-orange-500 transition-colors group-hover:text-white" />
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 transition-colors group-hover:bg-blue-500">
+                <Lock className="h-7 w-7 text-blue-500 transition-colors group-hover:text-white" />
               </div>
               <h3 className="mt-4 text-base font-semibold text-gray-900">Escrow digital</h3>
               <p className="mt-2 text-sm leading-relaxed text-gray-500">
@@ -371,8 +371,8 @@ export function WebLandingScreen() {
 
             {/* Pillar 2 */}
             <div className="group rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-gray-200/60 transition-all hover:shadow-md sm:p-8">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 transition-colors group-hover:bg-orange-500">
-                <MapPin className="h-7 w-7 text-orange-500 transition-colors group-hover:text-white" />
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 transition-colors group-hover:bg-blue-500">
+                <MapPin className="h-7 w-7 text-blue-500 transition-colors group-hover:text-white" />
               </div>
               <h3 className="mt-4 text-base font-semibold text-gray-900">Verificación GPS</h3>
               <p className="mt-2 text-sm leading-relaxed text-gray-500">
@@ -382,8 +382,8 @@ export function WebLandingScreen() {
 
             {/* Pillar 3 */}
             <div className="group rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-gray-200/60 transition-all hover:shadow-md sm:p-8">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 transition-colors group-hover:bg-orange-500">
-                <Camera className="h-7 w-7 text-orange-500 transition-colors group-hover:text-white" />
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 transition-colors group-hover:bg-blue-500">
+                <Camera className="h-7 w-7 text-blue-500 transition-colors group-hover:text-white" />
               </div>
               <h3 className="mt-4 text-base font-semibold text-gray-900">Evidencia fotográfica</h3>
               <p className="mt-2 text-sm leading-relaxed text-gray-500">
@@ -393,8 +393,8 @@ export function WebLandingScreen() {
 
             {/* Pillar 4 */}
             <div className="group rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-gray-200/60 transition-all hover:shadow-md sm:p-8">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-50 transition-colors group-hover:bg-orange-500">
-                <Scale className="h-7 w-7 text-orange-500 transition-colors group-hover:text-white" />
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 transition-colors group-hover:bg-blue-500">
+                <Scale className="h-7 w-7 text-blue-500 transition-colors group-hover:text-white" />
               </div>
               <h3 className="mt-4 text-base font-semibold text-gray-900">Sistema de disputas</h3>
               <p className="mt-2 text-sm leading-relaxed text-gray-500">
@@ -408,8 +408,8 @@ export function WebLandingScreen() {
       {/* ──────────────── 5. DOWNLOAD APP ──────────────── */}
       <section className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 py-16 sm:py-20 lg:py-24">
         {/* Decorative elements */}
-        <div className="absolute top-0 right-0 h-96 w-96 rounded-full bg-orange-500/5 blur-3xl" />
-        <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-amber-500/5 blur-3xl" />
+        <div className="absolute top-0 right-0 h-96 w-96 rounded-full bg-blue-500/5 blur-3xl" />
+        <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-cyan-500/5 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
@@ -432,7 +432,7 @@ export function WebLandingScreen() {
                   'Seguí el estado de cada trabajo en vivo',
                 ].map((feature) => (
                   <li key={feature} className="flex items-start gap-3 text-gray-300">
-                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-orange-500" />
+                    <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-500" />
                     <span className="text-sm">{feature}</span>
                   </li>
                 ))}
@@ -469,13 +469,13 @@ export function WebLandingScreen() {
                   {/* Notch */}
                   <div className="absolute left-1/2 top-2 z-10 h-5 w-20 -translate-x-1/2 rounded-full bg-gray-900" />
                   {/* Screen */}
-                  <div className="h-full w-full overflow-hidden rounded-[2rem] bg-gradient-to-b from-orange-500 to-amber-500">
+                  <div className="h-full w-full overflow-hidden rounded-[2rem] bg-gradient-to-b from-blue-500 to-cyan-500">
                     <div className="flex h-full flex-col items-center justify-center px-6 text-center">
                       <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
                         <Zap className="h-9 w-9 text-white" />
                       </div>
                       <h3 className="mt-4 text-xl font-bold text-white">Resolvé</h3>
-                      <p className="mt-2 text-xs text-orange-100">
+                      <p className="mt-2 text-xs text-blue-100">
                         Servicios &amp; Productos
                       </p>
 
@@ -499,7 +499,7 @@ export function WebLandingScreen() {
                   </div>
                 </div>
                 {/* Glow behind phone */}
-                <div className="absolute -inset-8 -z-10 rounded-full bg-orange-500/20 blur-3xl" />
+                <div className="absolute -inset-8 -z-10 rounded-full bg-blue-500/20 blur-3xl" />
               </div>
             </div>
           </div>
@@ -513,7 +513,7 @@ export function WebLandingScreen() {
             {/* Brand */}
             <div className="sm:col-span-2 lg:col-span-1">
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-500">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500">
                   <Zap className="h-4 w-4 text-white" />
                 </div>
                 <span className="text-lg font-bold text-white">Resolvé</span>
@@ -530,7 +530,7 @@ export function WebLandingScreen() {
               <ul className="mt-3 space-y-2.5">
                 {['Cómo funciona', 'Profesionales', 'Productos', 'Seguridad'].map((link) => (
                   <li key={link}>
-                    <button className="text-sm text-gray-400 transition-colors hover:text-orange-400">
+                    <button className="text-sm text-gray-400 transition-colors hover:text-blue-400">
                       {link}
                     </button>
                   </li>
@@ -548,7 +548,7 @@ export function WebLandingScreen() {
                   'Preguntas frecuentes',
                 ].map((link) => (
                   <li key={link}>
-                    <button className="text-sm text-gray-400 transition-colors hover:text-orange-400">
+                    <button className="text-sm text-gray-400 transition-colors hover:text-blue-400">
                       {link}
                     </button>
                   </li>
@@ -561,19 +561,19 @@ export function WebLandingScreen() {
               <h4 className="text-sm font-semibold text-white">Seguinos</h4>
               <div className="mt-3 flex gap-3">
                 <button
-                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-800 text-gray-400 transition-colors hover:bg-orange-500 hover:text-white"
+                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-800 text-gray-400 transition-colors hover:bg-blue-500 hover:text-white"
                   aria-label="Instagram"
                 >
                   <Instagram className="h-4 w-4" />
                 </button>
                 <button
-                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-800 text-gray-400 transition-colors hover:bg-orange-500 hover:text-white"
+                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-800 text-gray-400 transition-colors hover:bg-blue-500 hover:text-white"
                   aria-label="Facebook"
                 >
                   <Facebook className="h-4 w-4" />
                 </button>
                 <button
-                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-800 text-gray-400 transition-colors hover:bg-orange-500 hover:text-white"
+                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-800 text-gray-400 transition-colors hover:bg-blue-500 hover:text-white"
                   aria-label="Twitter / X"
                 >
                   <Twitter className="h-4 w-4" />

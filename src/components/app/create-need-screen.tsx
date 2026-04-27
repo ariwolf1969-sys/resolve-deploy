@@ -78,12 +78,12 @@ export function CreateNeedScreen() {
                 onClick={() => setCategory(cat.id)}
                 className={`p-3.5 rounded-xl border-2 text-left transition-all ${
                   category === cat.id
-                    ? 'border-orange-500 bg-orange-50'
+                    ? 'border-blue-500 bg-blue-50'
                     : 'border-gray-100 hover:border-gray-200 bg-white'
                 }`}
               >
                 <span className="text-xl mb-1 block">{cat.emoji}</span>
-                <span className={`text-xs font-semibold ${category === cat.id ? 'text-orange-600' : 'text-foreground'}`}>
+                <span className={`text-xs font-semibold ${category === cat.id ? 'text-blue-600' : 'text-foreground'}`}>
                   {cat.name}
                 </span>
               </button>
@@ -100,7 +100,7 @@ export function CreateNeedScreen() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             maxLength={100}
-            className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+            className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
           />
           <p className="text-[10px] text-muted-foreground mt-1">{title.length}/100 caracteres</p>
         </div>
@@ -114,7 +114,7 @@ export function CreateNeedScreen() {
             onChange={(e) => setDescription(e.target.value)}
             maxLength={500}
             rows={3}
-            className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all resize-none"
+            className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
           />
           <p className="text-[10px] text-muted-foreground mt-1">{description.length}/500 caracteres</p>
         </div>
@@ -130,7 +130,7 @@ export function CreateNeedScreen() {
                 placeholder="0"
                 value={budget}
                 onChange={(e) => setBudget(e.target.value)}
-                className="w-full pl-7 pr-3 p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+                className="w-full pl-7 pr-3 p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
               />
             </div>
           </div>
@@ -168,7 +168,7 @@ export function CreateNeedScreen() {
               placeholder="Tu barrio o zona"
               value={neighborhood}
               onChange={(e) => setNeighborhood(e.target.value)}
-              className="w-full pl-9 pr-3 p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+              className="w-full pl-9 pr-3 p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
             />
           </div>
         </div>
@@ -189,7 +189,7 @@ export function CreateNeedScreen() {
         <button
           onClick={handleSubmit}
           disabled={!title.trim() || !category || isSubmitting}
-          className="w-full bg-orange-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] shadow-lg shadow-orange-500/20"
+          className="w-full bg-blue-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] shadow-lg shadow-blue-500/20"
         >
           {isSubmitting ? 'Publicando...' : 'Publicar necesidad'}
         </button>

@@ -82,7 +82,7 @@ export function UserRatingDialog() {
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           rows={2}
-          className="w-full p-3 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 resize-none mb-4"
+          className="w-full p-3 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none mb-4"
         />
 
         <div className="flex gap-2">
@@ -95,7 +95,7 @@ export function UserRatingDialog() {
           <button
             onClick={handleSubmit}
             disabled={score === 0 || isSubmitting}
-            className="flex-1 bg-orange-500 text-white py-3 rounded-xl text-sm font-semibold hover:bg-orange-600 disabled:opacity-50 transition-all"
+            className="flex-1 bg-blue-500 text-white py-3 rounded-xl text-sm font-semibold hover:bg-blue-600 disabled:opacity-50 transition-all"
           >
             {isSubmitting ? 'Enviando...' : 'Enviar calificación'}
           </button>
