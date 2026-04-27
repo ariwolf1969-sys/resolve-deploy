@@ -10,7 +10,6 @@ import {
   ArrowRight,
   Store,
   ChevronRight,
-  Play,
   CheckCircle,
   Lock,
   Users,
@@ -21,11 +20,14 @@ import {
   Instagram,
   Facebook,
   Twitter,
+  Menu,
+  X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { PROFESSIONS } from '@/components/app/home-screen';
+import { useState } from 'react';
 
 // ── Inline demo product data ──────────────────────────────────────
 const DEMO_PRODUCTS = [
@@ -55,7 +57,7 @@ const DEMO_PRODUCTS = [
     price: 25900,
     originalPrice: 38900,
     source: 'AliExpress',
-    image: 'https://placehold.co/400x300/f59e0b/ffffff?text=Cámara+WiFi',
+    image: 'https://placehold.co/400x300/f59e0b/ffffff?text=C%C3%A1mara+WiFi',
     rating: 4.3,
     reviews: 567,
   },
@@ -65,7 +67,7 @@ const DEMO_PRODUCTS = [
     price: 15900,
     originalPrice: 21900,
     source: 'Temu',
-    image: 'https://placehold.co/400x300/d97706/ffffff?text=Lámpara+LED',
+    image: 'https://placehold.co/400x300/d97706/ffffff?text=L%C3%A1mpara+LED',
     rating: 4.6,
     reviews: 213,
   },
@@ -96,6 +98,7 @@ function getSourceBadgeColor(source: string) {
 // ── Main Component ────────────────────────────────────────────────
 export function WebLandingScreen() {
   const { setView } = useAppStore();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-white">
@@ -105,39 +108,11 @@ export function WebLandingScreen() {
         <div className="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-blue-400/30 blur-3xl" />
         <div className="absolute -bottom-32 -left-32 h-[400px] w-[400px] rounded-full bg-cyan-400/30 blur-3xl" />
 
-        <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-20 sm:px-6 sm:pb-24 sm:pt-28 lg:px-8 lg:pb-32 lg:pt-36">
+        <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6 sm:pb-24 sm:pt-28 lg:px-8 lg:pb-32 lg:pt-36">
           {/* Nav bar */}
-          <nav className="mb-16 flex items-center justify-between sm:mb-20">
-            <div className="flex items-center gap-4">
-              {/* Login / Register buttons */}
-              <div className="flex items-center gap-2 sm:gap-3">
-                <button
-                  onClick={() => setView('onboarding')}
-                  className="p-2 sm:p-0 text-sm font-medium text-white/90 hover:text-white transition-colors"
-                  title="Iniciar sesión"
-                >
-                  <span className="hidden sm:inline">Iniciar sesión</span>
-                  <svg className="h-5 w-5 sm:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                    <polyline points="10 17 15 12 10 7" />
-                    <line x1="15" y1="12" x2="3" y2="12" />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => setView('onboarding')}
-                  className="p-2 sm:p-0 sm:px-4 sm:py-2 bg-white/20 backdrop-blur-sm text-sm font-semibold text-white rounded-lg hover:bg-white/30 transition-colors"
-                >
-                  <span className="hidden sm:inline">Creá tu cuenta</span>
-                  <svg className="h-5 w-5 sm:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                    <circle cx="8.5" cy="7" r="4" />
-                    <line x1="20" y1="8" x2="20" y2="14" />
-                    <line x1="23" y1="11" x2="17" y2="11" />
-                  </svg>
-                </button>
-              </div>
-              {/* Divider */}
-              <div className="hidden sm:block h-6 w-px bg-white/30" />
+          <nav className="mb-10 sm:mb-20">
+            {/* Mobile menu button */}
+            <div className="flex items-center justify-between">
               {/* Logo */}
               <div className="flex items-center gap-2">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
@@ -145,17 +120,74 @@ export function WebLandingScreen() {
                 </div>
                 <span className="text-xl font-bold text-white">Resolvé</span>
               </div>
+
+              {/* Mobile auth buttons - always visible on small screens */}
+              <div className="flex items-center gap-2 sm:hidden">
+                <button
+                  onClick={() => setView('onboarding')}
+                  className="px-3 py-2 text-xs font-medium text-white/90 hover:text-white bg-white/10 backdrop-blur-sm rounded-lg transition-colors"
+                >
+                  Ingresar
+                </button>
+                <button
+                  onClick={() => setView('onboarding')}
+                  className="px-3 py-2 text-xs font-semibold text-blue-600 bg-white rounded-lg hover:bg-blue-50 transition-colors"
+                >
+                  Creá tu cuenta
+                </button>
+              </div>
+
+              {/* Hamburger menu for mobile nav links */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="sm:hidden p-2 text-white/90 hover:text-white"
+              >
+                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </button>
             </div>
-            <div className="hidden items-center gap-6 sm:flex">
-              <button onClick={() => setView('home')} className="text-sm font-medium text-white/90 hover:text-white transition-colors">
-                Inicio
-              </button>
-              <button onClick={() => setView('products')} className="text-sm font-medium text-white/90 hover:text-white transition-colors">
-                Productos
-              </button>
-              <button className="text-sm font-medium text-white/90 hover:text-white transition-colors">
-                Seguridad
-              </button>
+
+            {/* Mobile menu dropdown */}
+            {mobileMenuOpen && (
+              <div className="sm:hidden mt-3 rounded-xl bg-white/10 backdrop-blur-md p-3 space-y-1">
+                <button onClick={() => { setView('home'); setMobileMenuOpen(false); }} className="block w-full text-left px-4 py-2.5 text-sm font-medium text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                  Inicio
+                </button>
+                <button onClick={() => { setView('products'); setMobileMenuOpen(false); }} className="block w-full text-left px-4 py-2.5 text-sm font-medium text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                  Productos
+                </button>
+                <button onClick={() => setMobileMenuOpen(false)} className="block w-full text-left px-4 py-2.5 text-sm font-medium text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                  Seguridad
+                </button>
+              </div>
+            )}
+
+            {/* Desktop nav */}
+            <div className="hidden sm:flex items-center justify-between">
+              <div className="flex items-center gap-6">
+                <button onClick={() => setView('home')} className="text-sm font-medium text-white/90 hover:text-white transition-colors">
+                  Inicio
+                </button>
+                <button onClick={() => setView('products')} className="text-sm font-medium text-white/90 hover:text-white transition-colors">
+                  Productos
+                </button>
+                <button className="text-sm font-medium text-white/90 hover:text-white transition-colors">
+                  Seguridad
+                </button>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setView('onboarding')}
+                  className="px-4 py-2 text-sm font-medium text-white/90 hover:text-white transition-colors"
+                >
+                  Iniciar sesión
+                </button>
+                <button
+                  onClick={() => setView('onboarding')}
+                  className="px-4 py-2 bg-white/20 backdrop-blur-sm text-sm font-semibold text-white rounded-lg hover:bg-white/30 transition-colors"
+                >
+                  Creá tu cuenta
+                </button>
+              </div>
             </div>
           </nav>
 
@@ -210,11 +242,47 @@ export function WebLandingScreen() {
         </div>
       </section>
 
-      {/* ──────────────── 2. HOW IT WORKS ──────────────── */}
-      <section className="bg-gray-50 py-16 sm:py-20 lg:py-24">
+      {/* ──────────────── 2. SERVICE CATEGORIES (OFICIOS) ──────────────── */}
+      <section className="bg-white py-14 sm:py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl lg:text-4xl">
+              Profesionales en tu zona
+            </h2>
+            <p className="mt-3 text-base text-gray-500 sm:text-lg">
+              Encontrá el profesional ideal para lo que necesitás
+            </p>
+          </div>
+          <div className="mt-8 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2.5 sm:gap-4">
+            {PROFESSIONS.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => setView('home')}
+                className="flex flex-col items-center gap-2 p-3 sm:p-4 rounded-xl border border-gray-100 bg-white hover:shadow-md hover:border-blue-200 active:bg-blue-50 transition-all"
+              >
+                <span className="text-2xl sm:text-3xl">{p.icon}</span>
+                <span className="text-[11px] sm:text-xs font-semibold text-center leading-tight text-gray-700">{p.name}</span>
+              </button>
+            ))}
+          </div>
+          <div className="mt-8 text-center">
+            <Button
+              variant="ghost"
+              className="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+              onClick={() => setView('home')}
+            >
+              Ver todos los profesionales
+              <ChevronRight className="ml-1 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* ──────────────── 3. HOW IT WORKS ──────────────── */}
+      <section className="bg-gray-50 py-14 sm:py-16 lg:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl lg:text-4xl">
               ¿Cómo funciona?
             </h2>
             <p className="mt-3 text-base text-gray-500 sm:text-lg">
@@ -222,7 +290,7 @@ export function WebLandingScreen() {
             </p>
           </div>
 
-          <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 sm:mt-16">
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 sm:mt-12 sm:gap-8">
             {/* Step 1 */}
             <div className="group relative rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200/60 transition-all hover:shadow-md sm:p-8">
               <div className="mb-5 flex items-center gap-4">
@@ -274,47 +342,83 @@ export function WebLandingScreen() {
         </div>
       </section>
 
-      {/* ──────────────── PROFESSIONALS SECTION ──────────────── */}
-      <section className="bg-white py-16 sm:py-20 lg:py-24">
+      {/* ──────────────── 4. TRUST & SECURITY (5 features) ──────────────── */}
+      <section className="bg-white py-14 sm:py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-              Profesionales en tu zona
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl lg:text-4xl">
+              Confianza y seguridad
             </h2>
             <p className="mt-3 text-base text-gray-500 sm:text-lg">
-              Encontrá el profesional ideal para lo que necesitás
+              Tu dinero y tus datos están protegidos en cada transacción
             </p>
           </div>
-          <div className="mt-10 grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-            {PROFESSIONS.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => setView('home')}
-                className="flex flex-col items-center gap-2 p-3 sm:p-4 rounded-xl border border-gray-100 bg-white hover:shadow-md hover:border-blue-200 transition-all"
-              >
-                <span className="text-2xl sm:text-3xl">{p.icon}</span>
-                <span className="text-[11px] sm:text-xs font-semibold text-center leading-tight text-gray-700">{p.name}</span>
-              </button>
-            ))}
-          </div>
-          <div className="mt-8 text-center">
-            <Button
-              variant="ghost"
-              className="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-              onClick={() => setView('home')}
-            >
-              Ver todos los profesionales
-              <ChevronRight className="ml-1 h-4 w-4" />
-            </Button>
+
+          {/* 5 trust pillars - responsive grid */}
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5 sm:mt-12 sm:gap-6">
+            {/* Pillar 1: Pagos 100% seguros */}
+            <div className="group rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 p-5 sm:p-6 text-center shadow-sm transition-all hover:shadow-lg sm:text-left">
+              <div className="mx-auto flex h-12 w-12 sm:mx-0 items-center justify-center rounded-xl bg-white/20 transition-colors group-hover:bg-white/30">
+                <Shield className="h-6 w-6 text-white" />
+              </div>
+              <h3 className="mt-4 text-sm font-bold text-white sm:text-base">Pagos 100% seguros</h3>
+              <p className="mt-2 text-xs leading-relaxed text-blue-100 sm:text-sm">
+                Dinero protegido hasta que confirmes que todo está bien
+              </p>
+            </div>
+
+            {/* Pillar 2: Escrow digital */}
+            <div className="group rounded-2xl bg-white p-5 sm:p-6 text-center shadow-sm ring-1 ring-gray-200/60 transition-all hover:shadow-md sm:text-left">
+              <div className="mx-auto flex h-12 w-12 sm:mx-0 items-center justify-center rounded-xl bg-blue-50 transition-colors group-hover:bg-blue-500">
+                <Lock className="h-6 w-6 text-blue-500 transition-colors group-hover:text-white" />
+              </div>
+              <h3 className="mt-4 text-sm font-bold text-gray-900 sm:text-base">Escrow digital</h3>
+              <p className="mt-2 text-xs leading-relaxed text-gray-500 sm:text-sm">
+                El dinero se retiene hasta que confirmes que el trabajo fue realizado correctamente
+              </p>
+            </div>
+
+            {/* Pillar 3: Verificación GPS */}
+            <div className="group rounded-2xl bg-white p-5 sm:p-6 text-center shadow-sm ring-1 ring-gray-200/60 transition-all hover:shadow-md sm:text-left">
+              <div className="mx-auto flex h-12 w-12 sm:mx-0 items-center justify-center rounded-xl bg-blue-50 transition-colors group-hover:bg-blue-500">
+                <MapPin className="h-6 w-6 text-blue-500 transition-colors group-hover:text-white" />
+              </div>
+              <h3 className="mt-4 text-sm font-bold text-gray-900 sm:text-base">Verificación GPS</h3>
+              <p className="mt-2 text-xs leading-relaxed text-gray-500 sm:text-sm">
+                El profesional registra su llegada con ubicación en tiempo real
+              </p>
+            </div>
+
+            {/* Pillar 4: Evidencia fotográfica */}
+            <div className="group rounded-2xl bg-white p-5 sm:p-6 text-center shadow-sm ring-1 ring-gray-200/60 transition-all hover:shadow-md sm:text-left">
+              <div className="mx-auto flex h-12 w-12 sm:mx-0 items-center justify-center rounded-xl bg-blue-50 transition-colors group-hover:bg-blue-500">
+                <Camera className="h-6 w-6 text-blue-500 transition-colors group-hover:text-white" />
+              </div>
+              <h3 className="mt-4 text-sm font-bold text-gray-900 sm:text-base">Evidencia fotográfica</h3>
+              <p className="mt-2 text-xs leading-relaxed text-gray-500 sm:text-sm">
+                Fotos con marca de tiempo como comprobante del trabajo realizado
+              </p>
+            </div>
+
+            {/* Pillar 5: Sistema de disputas */}
+            <div className="group rounded-2xl bg-white p-5 sm:p-6 text-center shadow-sm ring-1 ring-gray-200/60 transition-all hover:shadow-md sm:text-left">
+              <div className="mx-auto flex h-12 w-12 sm:mx-0 items-center justify-center rounded-xl bg-blue-50 transition-colors group-hover:bg-blue-500">
+                <Scale className="h-6 w-6 text-blue-500 transition-colors group-hover:text-white" />
+              </div>
+              <h3 className="mt-4 text-sm font-bold text-gray-900 sm:text-base">Sistema de disputas</h3>
+              <p className="mt-2 text-xs leading-relaxed text-gray-500 sm:text-sm">
+                Si hay algún problema, nuestro equipo de mediación resuelve la situación
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ──────────────── 3. PRODUCTS SECTION ──────────────── */}
-      <section className="bg-white py-16 sm:py-20 lg:py-24">
+      {/* ──────────────── 5. PRODUCTS SECTION ──────────────── */}
+      <section className="bg-gray-50 py-14 sm:py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl lg:text-4xl">
               Productos recomendados
             </h2>
             <p className="mt-3 text-base text-gray-500 sm:text-lg">
@@ -410,71 +514,8 @@ export function WebLandingScreen() {
         </div>
       </section>
 
-      {/* ──────────────── 4. TRUST & SECURITY ──────────────── */}
-      <section className="bg-gray-50 py-16 sm:py-20 lg:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-100">
-              <Shield className="h-7 w-7 text-blue-500" />
-            </div>
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-              Pagos 100% seguros
-            </h2>
-            <p className="mt-3 text-base text-gray-500 sm:text-lg">
-              Tu dinero está protegido en cada transacción
-            </p>
-          </div>
-
-          <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 sm:mt-16">
-            {/* Pillar 1 */}
-            <div className="group rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-gray-200/60 transition-all hover:shadow-md sm:p-8">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 transition-colors group-hover:bg-blue-500">
-                <Lock className="h-7 w-7 text-blue-500 transition-colors group-hover:text-white" />
-              </div>
-              <h3 className="mt-4 text-base font-semibold text-gray-900">Escrow digital</h3>
-              <p className="mt-2 text-sm leading-relaxed text-gray-500">
-                El dinero se retiene hasta que confirmes que el trabajo fue realizado correctamente
-              </p>
-            </div>
-
-            {/* Pillar 2 */}
-            <div className="group rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-gray-200/60 transition-all hover:shadow-md sm:p-8">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 transition-colors group-hover:bg-blue-500">
-                <MapPin className="h-7 w-7 text-blue-500 transition-colors group-hover:text-white" />
-              </div>
-              <h3 className="mt-4 text-base font-semibold text-gray-900">Verificación GPS</h3>
-              <p className="mt-2 text-sm leading-relaxed text-gray-500">
-                El profesional registra su llegada con ubicación en tiempo real
-              </p>
-            </div>
-
-            {/* Pillar 3 */}
-            <div className="group rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-gray-200/60 transition-all hover:shadow-md sm:p-8">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 transition-colors group-hover:bg-blue-500">
-                <Camera className="h-7 w-7 text-blue-500 transition-colors group-hover:text-white" />
-              </div>
-              <h3 className="mt-4 text-base font-semibold text-gray-900">Evidencia fotográfica</h3>
-              <p className="mt-2 text-sm leading-relaxed text-gray-500">
-                Fotos con marca de tiempo como comprobante del trabajo realizado
-              </p>
-            </div>
-
-            {/* Pillar 4 */}
-            <div className="group rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-gray-200/60 transition-all hover:shadow-md sm:p-8">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 transition-colors group-hover:bg-blue-500">
-                <Scale className="h-7 w-7 text-blue-500 transition-colors group-hover:text-white" />
-              </div>
-              <h3 className="mt-4 text-base font-semibold text-gray-900">Sistema de disputas</h3>
-              <p className="mt-2 text-sm leading-relaxed text-gray-500">
-                Si hay algún problema, nuestro equipo de mediación resuelve la situación
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ──────────────── 5. DOWNLOAD APP ──────────────── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 py-16 sm:py-20 lg:py-24">
+      {/* ──────────────── 6. DOWNLOAD APP ──────────────── */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 py-14 sm:py-16 lg:py-20">
         {/* Decorative elements */}
         <div className="absolute top-0 right-0 h-96 w-96 rounded-full bg-blue-500/5 blur-3xl" />
         <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-cyan-500/5 blur-3xl" />
@@ -483,7 +524,7 @@ export function WebLandingScreen() {
           <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
             {/* Text content */}
             <div className="text-center lg:text-left">
-              <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+              <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">
                 Llevá Resolvé en tu celular
               </h2>
               <p className="mt-4 text-base leading-relaxed text-gray-400 sm:text-lg">
@@ -574,7 +615,7 @@ export function WebLandingScreen() {
         </div>
       </section>
 
-      {/* ──────────────── 6. FOOTER ──────────────── */}
+      {/* ──────────────── 7. FOOTER ──────────────── */}
       <footer className="bg-gray-900 pt-12 pb-8 sm:pt-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -658,6 +699,25 @@ export function WebLandingScreen() {
           </div>
         </div>
       </footer>
+
+      {/* ──────────────── FLOATING MOBILE CTA ──────────────── */}
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 sm:hidden w-[calc(100%-2rem)] max-w-sm">
+        <button
+          onClick={() => setView('onboarding')}
+          className="w-full bg-blue-500 text-white py-3.5 rounded-2xl font-semibold text-sm shadow-lg shadow-blue-500/30 hover:bg-blue-600 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="8.5" cy="7" r="4" />
+            <line x1="20" y1="8" x2="20" y2="14" />
+            <line x1="23" y1="11" x2="17" y2="11" />
+          </svg>
+          Creá tu cuenta gratis
+        </button>
+      </div>
+
+      {/* Bottom spacer for mobile floating button */}
+      <div className="h-20 sm:hidden" />
     </div>
   );
 }
