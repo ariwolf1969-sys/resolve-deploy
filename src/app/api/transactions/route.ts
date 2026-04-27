@@ -1,45 +1,111 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/lib/db';
 
-// POST /api/transactions - create a transaction
-export async function POST(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const data = await req.json()
-    const { type, amount, description, quoteId, userId } = data
+    const { searchParams } = new URL(request.url);
+    const quoteId = searchParams.get('quoteId');
+    const userId = searchParams.get('userId');
+    const status = searchParams.get('status');
 
-    if (!type || !amount || !userId) {
-      return NextResponse.json({ error: 'Datos requeridos faltantes' }, { status: 400 })
+    const where: Record<string, unknown> = {};
+
+    if (quoteId) {
+      where.quoteId = quoteId;
     }
 
-    const transaction = await db.transaction.create({
-      data: { type, amount, description, quoteId, userId, status: 'completed' },
-    })
+    if (userId) {
+      where.userId = userId;
+    }
 
-    return NextResponse.json(transaction, { status: 201 })
-  } catch (error) {
-    console.error('Create transaction error:', error)
-    return NextResponse.json({ error: 'Error al crear transacción' }, { status: 500 })
-  }
-}
-
-// GET /api/transactions - list transactions
-export async function GET(req: NextRequest) {
-  try {
-    const { searchParams } = new URL(req.url)
-    const userId = searchParams.get('userId')
-
-    if (!userId) {
-      return NextResponse.json({ error: 'userId requerido' }, { status: 400 })
+    if (status) {
+      where.status = status;
     }
 
     const transactions = await db.transaction.findMany({
-      where: { userId },
+      where,
       orderBy: { createdAt: 'desc' },
-    })
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+            email: true,
+            avatar: true,
+          },
+        },
+        quote: {
+          select: {
+            id: true,
+            title: true,
+            status: true,
+          },
+        },
+      },
+    });
 
-    return NextResponse.json(transactions)
+    return NextResponse.json({ data: transactions });
   } catch (error) {
-    console.error('List transactions error:', error)
-    return NextResponse.json({ error: 'Error al obtener transacciones' }, { status: 500 })
+    console.error('Error fetching transactions:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+
+    const { quoteId, userId, amount, paymentMethod, paymentRef } = body;
+
+    if (!quoteId || !userId || amount == null || !paymentMethod) {
+      return NextResponse.json(
+        { error: 'Missing required fields: quoteId, userId, amount, paymentMethod' },
+        { status: 400 }
+      );
+    }
+
+    const platformFee = Math.round(amount * 0.08 * 100) / 100;
+
+    const transaction = await db.transaction.create({
+      data: {
+        quoteId,
+        userId,
+        amount,
+        platformFee,
+        paymentMethod,
+        paymentRef: paymentRef ?? null,
+        status: 'pending',
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+            email: true,
+            avatar: true,
+          },
+        },
+        quote: {
+          select: {
+            id: true,
+            title: true,
+            status: true,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json({ data: transaction }, { status: 201 });
+  } catch (error) {
+    console.error('Error creating transaction:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

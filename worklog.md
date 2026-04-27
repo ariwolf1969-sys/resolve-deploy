@@ -1,82 +1,91 @@
-# Resolvé - Worklog
+---
+Task ID: 1
+Agent: Main Agent
+Task: Restructurar Resolvé al modelo de buscador de profesionales con precio por hora estilo TaskRabbit
 
-## Build Summary (Rebuild from scratch)
+Work Log:
+- Leído el estado completo del proyecto: schema Prisma, store Zustand, todas las pantallas y API routes
+- Actualizado `register-pro-screen.tsx`: 4 pasos (antes 3), precio por hora OBLIGATORIO con badge, foto de perfil obligatoria, selector de experiencia visual, preview card con precio
+- Transformado `home-screen.tsx`: de feed de necesidades a buscador de profesionales - grid de 18 profesiones populares, top 6 profesionales mejor calificados con tarifa/hora visible, sección "cómo funciona", indicadores de confianza
+- Actualizado `search-overlay.tsx`: ordenar por rating/precio ascendente/precio descendente, tarjetas mejoradas con precio por hora destacado en badge verde (estilo TaskRabbit)
+- Actualizado `pro-profile-screen.tsx`: tarifa por hora muy prominente con tipografía grande y gradiente verde, precio visible en botón de contacto
+- Actualizado `bottom-nav.tsx`: botón central cambiado de "Publicar" a "Soy Pro" (registro profesional)
+- Actualizado `profile-screen.tsx`: stats con precio/hora, badge profesional con tarifa, botón "Editar perfil profesional" para quienes ya están registrados
+- Build exitoso sin errores, servidor corriendo en localhost:3000 con 200 OK
 
-### Prisma Schema
-- **File**: `prisma/schema.prisma`
-- Models: User, Need, Response, ChatThread, ChatThreadParticipant, Message, Rating, AffiliateProduct, AffiliateClick, Quote, Transaction, CheckIn, Dispute
-- SQLite database at `db/custom.db`
-- User model includes all professional fields (skills, experience, education, certifications, hourlyRate, etc.)
+Stage Summary:
+- Modelo completamente pivotado de "needs posting" a "directorio/buscador de profesionales"
+- Precio por hora es OBLIGATORIO al registrarse como profesional (estilo TaskRabbit)
+- Foto de perfil real es OBLIGATORIA para registrarse como profesional
+- Todas las tarjetas de profesionales muestran precio/hora prominente
+- Navegación actualizada al modelo buscador-first
+- 12 profesionales demo con precios por hora ya existentes en seed data
 
-### Zustand Store
-- **File**: `src/store/app-store.ts`
-- SPA-like navigation with `currentView` state
-- Persistent auth state (token + user)
-- View history for back navigation
-- All 16+ view types defined
+---
+Task ID: 2
+Agent: Main Agent
+Task: Agregar cobertura nacional (provincias/ciudades), zona de trabajo GBA, carrusel publicitario
 
-### API Routes
-All routes are real API calls (NO demo mode):
-1. `POST /api/auth/register` - User registration with +54 phone formatting
-2. `POST /api/auth/login` - Login by email or phone
-3. `GET /api/auth/me` - Token validation
-4. `GET /api/users` - List users with filters
-5. `GET/PUT /api/users/[id]` - Get/update user
-6. `GET /api/professionals` - List professionals with filters
-7. `POST/GET /api/needs` - Create/list needs
-8. `GET /api/needs/[id]` - Get need with responses
-9. `POST/GET /api/quotes` - Create/list quotes
-10. `GET/PUT /api/quotes/[id]` - Get/update quote status
-11. `POST/GET /api/transactions` - Create/list transactions
-12. `GET /api/products/real` - List affiliate products
-13. `POST/GET /api/chat` - List/create chat threads
-14. `GET/POST /api/chat/[threadId]/messages` - Get/send messages
-15. `POST /api/seed` - Seed database with sample data
+Work Log:
+- Actualizado Prisma schema: campos province, city, workZone en modelo User
+- Creado archivo `src/lib/argentina-locations.ts` con 24 provincias argentinas y sus ciudades principales + zonas de trabajo para CABA/GBA
+- Actualizado store Zustand: tipo User con province/city/workZone, estado de filtros selectedProvince/selectedCity/selectedWorkZone
+- Actualizado `register-pro-screen.tsx`: 5 pasos (nuevo paso 1: "¿Dónde trabajás?" con provincia, ciudad, zona de trabajo)
+- Actualizado `home-screen.tsx`: carrusel publicitario (4 ads demo con auto-scroll), ubicación con provincia/ciudad, indicador "Cobertura nacional"
+- Actualizado `search-overlay.tsx`: filtro por ubicación colapsable (provincia, ciudad, zona de trabajo), pasado como query params a la API
+- Actualizado `pro-profile-screen.tsx`: tarjeta de ubicación con provincia/ciudad/zona, import getProvinceName
+- Actualizado `api/professionals/route.ts`: filtros province/city/workZone, soporte price_asc/price_desc en sort
+- Actualizado `api/seed/route.ts`: 12 usuarios existentes con province/city/workZone, 6 NUEVOS usuarios de otras provincias (Córdoba, Mendoza, Santa Fe, Tucumán, Misiones, Salta) — total 18 profesionales
+- Build exitoso, compilación sin errores
 
-### Screen Components (src/components/app/)
+Stage Summary:
+- La app ahora funciona a NIVEL NACIONAL con las 24 provincias de Argentina
+- Registro profesional incluye selección de provincia + ciudad + zona de trabajo (GBA)
+- 18 profesionales demo cubriendo 8 provincias diferentes
+- Carrusel publicitario funcional en home screen (espacio para que empresas compren publicidad)
+- Búsqueda con filtro por provincia, ciudad y zona de trabajo
+- Todas las tarjetas de profesionales muestran ubicación completa (ciudad, provincia)
 
-1. **app-container.tsx** - Main SPA router with token validation
-2. **splash-screen.tsx** - Login/Register with FIXED phone input
-3. **home-screen.tsx** - Main page with professions, carousels, top pros
-4. **profile-screen.tsx** - User profile with menu items
-5. **edit-profile-screen.tsx** - Edit profile with FIXED phone input
-6. **pro-profile-screen.tsx** - Professional profile with quote request
-7. **register-pro-screen.tsx** - 5-step professional registration wizard
-8. **products-screen.tsx** - Product marketplace with filters
-9. **quotes-screen.tsx** - Quote/budget list (sent/received tabs)
-10. **create-quote-screen.tsx** - New quote request with professional search
-11. **quote-detail-screen.tsx** - Quote detail with status management
-12. **payments-screen.tsx** - Transaction history with summary cards
-13. **chat-list-screen.tsx** - Chat thread list
-14. **chat-screen.tsx** - Real-time chat messaging
-15. **search-overlay.tsx** - Professional search with profession filters
+---
+Task ID: 3
+Agent: Main Agent
+Task: Expandir Resolvé a plataforma web completa con marketplace afiliado, sistema de presupuestos, pagos electrónicos y anti-fraude
 
-### Critical Fix: Phone Input
-- Fixed "+54" prefix label is OUTSIDE the input field
-- User types only local number digits (8-11 digits)
-- Input type="tel" with inputMode="numeric"
-- No auto-formatting during typing
-- On submit, "+54" is prepended to get full international format
-- Applied in: splash-screen (register & login), edit-profile
+Work Log:
+- Actualizado Prisma schema con 5 modelos nuevos: AffiliateProduct, Quote, Transaction, CheckIn, Dispute
+- Ejecutado db:push exitosamente, Prisma Client regenerado
+- Actualizado store Zustand con nuevos tipos (AffiliateProduct, Quote, Transaction, CheckIn, Dispute) y estados (filtros de productos, producto seleccionado, quote seleccionado)
+- Creadas 8 API routes nuevas:
+  - /api/products (GET paginado con filtros)
+  - /api/quotes (GET + POST)
+  - /api/quotes/[id] (GET + PUT con transiciones de estado)
+  - /api/transactions (GET + POST con fee automático 8%)
+  - /api/transactions/[id] (PUT status updates)
+  - /api/checkin (GET + POST)
+  - /api/disputes (GET + POST)
+  - /api/disputes/[id] (PUT status/resolution)
+- Creados 10 componentes de pantalla nuevos:
+  - WebLandingScreen: Landing page web completa con 6 secciones (Hero, Cómo funciona, Productos, Seguridad, Descargar app, Footer)
+  - ProductsScreen: Catálogo de productos con búsqueda, filtros por fuente y categoría, grid responsivo
+  - QuotesScreen: Lista de presupuestos recibidos/enviados con tabs y FAB
+  - CreateQuoteScreen: Formulario de creación de presupuesto con validación
+  - QuoteDetailScreen: Detalle completo con timeline de 5 pasos, acciones contextuales
+  - PaymentsScreen: Historial de pagos con summary cards y filtros por estado
+  - CheckInScreen: Sistema anti-fraude con 5 pasos (GPS, fotos, confirmación, progreso, finalización)
+  - DisputeScreen: Formulario de disputa con evidencia, severidad y timeline de resolución
+  - ProductDetailScreen: Detalle de producto con CTA a tienda externa
+- Actualizado AppContainer: integradas todas las nuevas vistas, soporte para full-width (web landing) y app views
+- Actualizado BottomNav: 5 tabs (Inicio, Productos, Soy Pro, Presup., Perfil)
+- Actualizado ProfileScreen: acceso a Mis Presupuestos y Mis Pagos
+- Actualizado SplashScreen: navega a web-landing en vez de onboarding
+- Actualizado seed data: 20 productos afiliados, 4 presupuestos demo, 3 transacciones, 3 check-ins
 
-### Color Scheme
-- All primary colors use BLUE (blue-600, blue-700, blue-500, etc.)
-- Green badges for hourly rates
-- Red buttons for logout/errors
-- No orange anywhere in the codebase
-
-### Home Page Features
-- "Iniciar sesión" button visible when not logged in
-- Horizontally scrollable professions section with all 10 categories
-- "Ofertas del día" product carousel (featured)
-- "Populares" product carousel (popular)
-- Top 5 professionals list
-- Quick action cards when logged in
-- Professional registration CTA for regular users
-- Bottom navigation bar
-
-### Seed Data
-- 10 professional users across all categories
-- 6 affiliate products
-- 3 sample quotes
-- All with realistic Argentine data
+Stage Summary:
+- Plataforma web completa con landing page profesional y marketplace de productos afiliados
+- Sistema de presupuestos electrónicos con flujo completo (crear, aceptar, rechazar, completar)
+- Sistema de escrow/pago seguro (8% comisión plataforma, retención hasta confirmación)
+- Sistema anti-fraude con verificación GPS, evidencia fotográfica, timeline de check-in
+- Sistema de disputas con reporte, investigación y resolución
+- 20 productos demo de 6 marketplaces (Amazon, eBay, MercadoLibre, AliExpress, Temu, SHEIN)
+- Navegación actualizada con acceso a todas las secciones nuevas
+- Todas las contrataciones de servicios se pagan exclusivamente por medios electrónicos

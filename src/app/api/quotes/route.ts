@@ -1,66 +1,127 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/lib/db';
 
-// POST /api/quotes - create a quote
-export async function POST(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const data = await req.json()
-    const { title, description, senderId, receiverId, price, urgency, city, province } = data
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get('status');
+    const clientId = searchParams.get('clientId');
+    const providerId = searchParams.get('providerId');
 
-    if (!title || !senderId || !receiverId) {
-      return NextResponse.json({ error: 'Datos requeridos faltantes' }, { status: 400 })
+    const where: Record<string, unknown> = {};
+
+    if (status) {
+      where.status = status;
     }
 
-    // Set expiration 7 days from now
-    const expiresAt = new Date()
-    expiresAt.setDate(expiresAt.getDate() + 7)
+    if (clientId) {
+      where.clientId = clientId;
+    }
 
-    const quote = await db.quote.create({
-      data: {
-        title,
-        description,
-        senderId,
-        receiverId,
-        price,
-        urgency,
-        city,
-        province,
-        expiresAt,
-      },
-    })
-
-    return NextResponse.json(quote, { status: 201 })
-  } catch (error) {
-    console.error('Create quote error:', error)
-    return NextResponse.json({ error: 'Error al crear presupuesto' }, { status: 500 })
-  }
-}
-
-// GET /api/quotes - list quotes
-export async function GET(req: NextRequest) {
-  try {
-    const { searchParams } = new URL(req.url)
-    const senderId = searchParams.get('senderId')
-    const receiverId = searchParams.get('receiverId')
-    const status = searchParams.get('status')
-
-    const where: Record<string, unknown> = {}
-    if (senderId) where.senderId = senderId
-    if (receiverId) where.receiverId = receiverId
-    if (status) where.status = status
+    if (providerId) {
+      where.providerId = providerId;
+    }
 
     const quotes = await db.quote.findMany({
       where,
       orderBy: { createdAt: 'desc' },
       include: {
-        sender: { select: { id: true, name: true, avatar: true } },
-        receiver: { select: { id: true, name: true, avatar: true, profession: true } },
+        provider: {
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+            email: true,
+            avatar: true,
+            profession: true,
+            ratingAvg: true,
+            completedJobs: true,
+            location: true,
+          },
+        },
+        client: {
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+            email: true,
+            avatar: true,
+            location: true,
+          },
+        },
       },
-    })
+    });
 
-    return NextResponse.json(quotes)
+    return NextResponse.json({ data: quotes });
   } catch (error) {
-    console.error('List quotes error:', error)
-    return NextResponse.json({ error: 'Error al obtener presupuestos' }, { status: 500 })
+    console.error('Error fetching quotes:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+
+    const { title, description, amount, providerId, clientId, needId, includesMaterials, estimatedHours, validityHours, providerMessage } = body;
+
+    if (!title || !description || amount == null || !providerId || !clientId) {
+      return NextResponse.json(
+        { error: 'Missing required fields: title, description, amount, providerId, clientId' },
+        { status: 400 }
+      );
+    }
+
+    const hours = validityHours || 48;
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + hours);
+
+    const quote = await db.quote.create({
+      data: {
+        title,
+        description,
+        amount,
+        providerId,
+        clientId,
+        needId: needId || null,
+        includesMaterials: includesMaterials ?? false,
+        estimatedHours: estimatedHours ?? null,
+        validityHours: hours,
+        providerMessage: providerMessage ?? null,
+        expiresAt,
+      },
+      include: {
+        provider: {
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+            email: true,
+            avatar: true,
+            profession: true,
+          },
+        },
+        client: {
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+            email: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json({ data: quote }, { status: 201 });
+  } catch (error) {
+    console.error('Error creating quote:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

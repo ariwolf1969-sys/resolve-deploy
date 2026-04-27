@@ -1,285 +1,318 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useAppStore } from '@/store/app-store'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Skeleton } from '@/components/ui/skeleton'
-import {
-  Search,
-  ArrowLeft,
-  X,
-  MapPin,
-  Star,
-  Clock,
-  Filter,
-} from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react';
+import { useAppStore, type User } from '@/store/app-store';
+import { formatBudget, renderStars } from './home-screen';
+import { PROFESSIONS } from './home-screen';
+import { ARGENTINA_PROVINCES, getCitiesByProvince, getWorkZonesByProvince, getProvinceName } from '@/lib/argentina-locations';
 
-interface Professional {
-  id: string
-  name: string
-  avatar: string | null
-  profession: string | null
-  bio: string | null
-  city: string | null
-  province: string | null
-  hourlyRate: number | null
-  rating: number
-  reviewCount: number
-  isVerified: boolean
-}
+export function SearchOverlay() {
+  const {
+    setView,
+    setSelectedUserProfile,
+    setSelectedNeed,
+    selectedProvince,
+    setSelectedProvince,
+    selectedCity,
+    setSelectedCity,
+    selectedWorkZone,
+    setSelectedWorkZone,
+  } = useAppStore();
+  const [query, setQuery] = useState('');
+  const [professionals, setProfessionals] = useState<User[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [sortBy, setSortBy] = useState<'rating' | 'price_asc' | 'price_desc' | 'distance'>('rating');
+  const [showLocationFilter, setShowLocationFilter] = useState(false);
 
-const professionLabels: Record<string, string> = {
-  electricista: 'Electricista',
-  plomero: 'Plomero',
-  albañil: 'Albañil',
-  pintor: 'Pintor',
-  gasista: 'Gasista',
-  cerrajero: 'Cerrajero',
-  peluquero: 'Peluquero',
-  chofer: 'Chofer',
-  manicura: 'Manicura',
-  'apoyo-escolar': 'Apoyo escolar',
-}
+  const clearLocationFilters = () => {
+    setSelectedProvince('');
+    setSelectedCity('');
+    setSelectedWorkZone('');
+  };
 
-const professions = [
-  { id: 'electricista', label: 'Electricista', icon: '⚡' },
-  { id: 'plomero', label: 'Plomero', icon: '🔧' },
-  { id: 'albañil', label: 'Albañil', icon: '🧱' },
-  { id: 'pintor', label: 'Pintor', icon: '🎨' },
-  { id: 'gasista', label: 'Gasista', icon: '🔥' },
-  { id: 'cerrajero', label: 'Cerrajero', icon: '🔑' },
-  { id: 'peluquero', label: 'Peluquero', icon: '✂️' },
-  { id: 'chofer', label: 'Chofer', icon: '🚗' },
-  { id: 'manicura', label: 'Manicura', icon: '💅' },
-  { id: 'apoyo-escolar', label: 'Apoyo escolar', icon: '📚' },
-]
-
-export default function SearchOverlay({
-  initialProfession,
-}: {
-  initialProfession?: string
-}) {
-  const { goBack, setView } = useAppStore()
-  const [query, setQuery] = useState('')
-  const [profession, setProfession] = useState(initialProfession || '')
-  const [results, setResults] = useState<Professional[]>([])
-  const [loading, setLoading] = useState(false)
-  const [searched, setSearched] = useState(false)
-
-  // Auto-search on initial profession
-  useEffect(() => {
-    if (initialProfession) {
-      doSearch('', initialProfession)
-    }
-  }, [initialProfession])
-
-  const doSearch = async (q: string = query, prof: string = profession) => {
-    setLoading(true)
-    setSearched(true)
+  const searchProfessionals = useCallback(async (q: string) => {
+    if (q.length < 2) { setProfessionals([]); return; }
+    setIsSearching(true);
     try {
-      let url = '/api/professionals?limit=20'
-      const params = new URLSearchParams()
-      if (q) params.set('search', q)
-      if (prof) params.set('profession', prof)
-      if (params.toString()) url += '&' + params.toString()
+      const params = new URLSearchParams();
+      params.set('q', q);
+      params.set('sort', sortBy);
+      params.set('limit', '50');
+      if (selectedProvince) params.set('province', selectedProvince);
+      if (selectedCity) params.set('city', selectedCity);
+      if (selectedWorkZone) params.set('workZone', selectedWorkZone);
+      const res = await fetch(`/api/professionals?${params}`);
+      if (res.ok) setProfessionals(await res.json());
+    } catch (err) { console.error(err); }
+    setIsSearching(false);
+  }, [sortBy, selectedProvince, selectedCity, selectedWorkZone]);
 
-      const res = await fetch(url)
-      const data = await res.json()
-      setResults(Array.isArray(data) ? data : [])
-    } catch {
-      setResults([])
-    } finally {
-      setLoading(false)
-    }
+  useEffect(() => {
+    if (query.length >= 2) searchProfessionals(query);
+    else setProfessionals([]);
+  }, [query, sortBy, searchProfessionals]);
+
+  const handleProfessionClick = async (profession: string) => {
+    setQuery(profession);
+  };
+
+  const sortedProfessionals = [...professionals];
+  if (sortBy === 'price_asc') {
+    sortedProfessionals.sort((a, b) => (a.hourlyRate || 0) - (b.hourlyRate || 0));
+  } else if (sortBy === 'price_desc') {
+    sortedProfessionals.sort((a, b) => (b.hourlyRate || 0) - (a.hourlyRate || 0));
   }
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    doSearch()
-  }
-
-  const selectProfession = (profId: string) => {
-    if (profession === profId) {
-      setProfession('')
-    } else {
-      setProfession(profId)
-    }
-  }
-
-  const clearFilters = () => {
-    setQuery('')
-    setProfession('')
-    setResults([])
-    setSearched(false)
-  }
-
-  const formatPrice = (price: number) =>
-    new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS',
-      minimumFractionDigits: 0,
-    }).format(price)
-
-  const hasFilters = query || profession
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-30">
-        <div className="px-4 py-3 flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={goBack}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-lg font-semibold">Buscar</h1>
+    <div className="min-h-full bg-background">
+      {/* Search Bar */}
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-lg border-b px-4 py-3">
+        <div className="flex items-center gap-3">
+          <button onClick={() => setView('home')} className="p-2 -ml-2 rounded-lg hover:bg-muted transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+          <div className="flex-1 relative">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Ej: electricistas, plomeros, albañiles..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+              autoFocus
+            />
+          </div>
         </div>
 
-        {/* Search bar */}
-        <form onSubmit={handleSearch} className="px-4 pb-3">
-          <div className="flex gap-2">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Nombre, profesión..."
-                className="pl-10"
-              />
-            </div>
-            {hasFilters && (
-              <Button type="button" variant="ghost" size="icon" onClick={clearFilters}>
-                <X className="h-4 w-4" />
-              </Button>
-            )}
-            <Button
-              type="submit"
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              <Search className="h-4 w-4" />
-            </Button>
-          </div>
-        </form>
-      </header>
-
-      <main className="px-4 py-4 space-y-4 pb-24">
-        {/* Profession filters */}
-        <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
-          <div className="flex gap-2">
-            {professions.map((p) => (
-              <Button
-                key={p.id}
-                variant={profession === p.id ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => selectProfession(p.id)}
-                className={`shrink-0 ${
-                  profession === p.id ? 'bg-blue-600 hover:bg-blue-700' : ''
+        {/* Sort options - only show when there are results */}
+        {professionals.length > 0 && (
+          <div className="flex gap-1.5 mt-3 overflow-x-auto pb-1">
+            {[
+              { key: 'rating' as const, label: '⭐ Mejor valorados' },
+              { key: 'price_asc' as const, label: '💰 Menor precio' },
+              { key: 'price_desc' as const, label: '💎 Mayor precio' },
+            ].map(opt => (
+              <button
+                key={opt.key}
+                onClick={() => setSortBy(opt.key)}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-semibold whitespace-nowrap transition-all ${
+                  sortBy === opt.key
+                    ? 'bg-orange-500 text-white shadow-sm'
+                    : 'bg-muted text-muted-foreground hover:bg-gray-200'
                 }`}
               >
-                {p.icon} {p.label}
-              </Button>
+                {opt.label}
+              </button>
             ))}
+          </div>
+        )}
+
+        {/* Location Filter */}
+        <div className="mt-3">
+          <button
+            onClick={() => setShowLocationFilter(!showLocationFilter)}
+            className="flex items-center gap-2 text-xs font-semibold text-foreground"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
+            <span>Filtrar por ubicación</span>
+            {selectedProvince && <span className="px-1.5 py-0.5 rounded bg-orange-100 text-orange-600 text-[9px]">Activo</span>}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className={`h-3.5 w-3.5 transition-transform ${showLocationFilter ? 'rotate-180' : ''}`}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </button>
+
+          {showLocationFilter && (
+            <div className="bg-white border border-gray-200 rounded-xl p-3 space-y-2 mt-2">
+              {/* Province select */}
+              <select
+                value={selectedProvince}
+                onChange={(e) => setSelectedProvince(e.target.value)}
+                className="w-full p-2.5 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+              >
+                <option value="">Todas las provincias</option>
+                {ARGENTINA_PROVINCES.map(p => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </select>
+
+              {/* City select (conditional) */}
+              {selectedProvince && (
+                <select
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.target.value)}
+                  className="w-full p-2.5 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                >
+                  <option value="">Todas las ciudades</option>
+                  {getCitiesByProvince(selectedProvince).map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              )}
+
+              {/* Work zone buttons (conditional) */}
+              {selectedProvince && ['caba', 'buenos_aires'].includes(selectedProvince) && (
+                <div className="flex gap-1.5 flex-wrap">
+                  {getWorkZonesByProvince(selectedProvince).map(zone => (
+                    <button
+                      key={zone}
+                      onClick={() => setSelectedWorkZone(selectedWorkZone === zone ? '' : zone)}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-semibold transition-all ${
+                        selectedWorkZone === zone
+                          ? 'bg-orange-500 text-white shadow-sm'
+                          : 'bg-muted text-muted-foreground hover:bg-gray-200'
+                      }`}
+                    >
+                      {zone}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Clear filter button */}
+              {(selectedProvince || selectedCity) && (
+                <button onClick={clearLocationFilters} className="text-xs text-red-500 font-medium hover:text-red-600 transition-colors">
+                  Limpiar filtros
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="px-4 py-3">
+        {query.length < 2 ? (
+          <div>
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Busc&#xE1; por profesi&#xF3;n</h3>
+            <div className="grid grid-cols-3 gap-2">
+              {PROFESSIONS.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => handleProfessionClick(p.name)}
+                  className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-gray-100 bg-white hover:shadow-sm hover:border-orange-200 transition-all active:scale-95"
+                >
+                  <span className="text-2xl">{p.icon}</span>
+                  <span className="text-[10px] font-medium text-center leading-tight">{p.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : isSearching ? (
+          <div className="flex justify-center py-12">
+            <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : sortedProfessionals.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+            </div>
+            <h3 className="font-semibold mb-1">Sin resultados</h3>
+            <p className="text-sm text-muted-foreground">No encontramos profesionales para &quot;{query}&quot;</p>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs text-muted-foreground">{sortedProfessionals.length} profesionales encontrados</p>
+              <p className="text-[10px] text-green-600 font-semibold">&#x1F4B0; Precios por hora visibles</p>
+            </div>
+            <div className="space-y-2.5">
+              {sortedProfessionals.map(pro => (
+                <ProfessionalCard key={pro.id} pro={pro} onClick={() => { setSelectedUserProfile(pro); setView('pro-profile'); }} />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ProfessionalCard({ pro, onClick }: { pro: User; onClick: () => void }) {
+  const locationLabel = pro.province
+    ? pro.city
+      ? `${pro.city}, ${getProvinceName(pro.province)}`
+      : getProvinceName(pro.province)
+    : pro.neighborhood || 'Sin ubicación';
+
+  return (
+    <button onClick={onClick} className="w-full text-left bg-white border border-gray-100 rounded-2xl p-4 hover:shadow-md transition-all shadow-sm">
+      <div className="flex items-start gap-3">
+        {/* Avatar */}
+        <div className="relative shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-md">
+            <span className="text-xl font-bold text-white">{pro.name.charAt(0)}</span>
+          </div>
+          {pro.available && (
+            <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
+          )}
+        </div>
+
+        <div className="flex-1 min-w-0">
+          {/* Name + badges */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <h3 className="font-bold text-sm">{pro.name}</h3>
+            {pro.dniVerified && (
+              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-600 text-[9px] font-semibold">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5" viewBox="0 0 24 24" fill="currentColor"><path fillRule="evenodd" d="M8.603 3.799A4.49 4.49 0 0 1 12 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 0 1 3.498 1.307 4.491 4.491 0 0 1 1.307 3.497A4.49 4.49 0 0 1 21.75 12a4.49 4.49 0 0 1-1.549 3.397 4.491 4.491 0 0 1-1.307 3.497 4.491 4.491 0 0 1-3.497 1.307A4.49 4.49 0 0 1 12 21.75a4.49 4.49 0 0 1-3.397-1.549 4.49 4.49 0 0 1-3.498-1.306 4.491 4.491 0 0 1-1.307-3.498A4.49 4.49 0 0 1 2.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 0 1 1.307-3.497 4.49 4.49 0 0 1 3.497-1.307zm7.007 6.387a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25z" clipRule="evenodd" /></svg>
+                Verificado
+              </span>
+            )}
+          </div>
+
+          {/* Profession */}
+          <p className="text-xs font-medium text-orange-600 mt-0.5">{pro.profession}</p>
+
+          {/* Rating + jobs */}
+          <div className="flex items-center gap-3 mt-1.5">
+            <div className="flex items-center gap-1">
+              <div className="flex">{renderStars(pro.ratingAvg)}</div>
+              <span className="text-[10px] text-muted-foreground">{pro.ratingAvg} ({pro.ratingCount})</span>
+            </div>
+            <span className="text-[10px] text-muted-foreground">{pro.completedJobs} trabajos</span>
+          </div>
+
+          {/* Location */}
+          <div className="flex items-center gap-3 mt-2 pt-2 border-t border-gray-50">
+            <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
+              {locationLabel}
+            </span>
+            {pro.experience && (
+              <span className="text-[10px] text-muted-foreground">{pro.experience}</span>
+            )}
           </div>
         </div>
 
-        {/* Results */}
-        {loading ? (
-          [1, 2, 3].map((i) => <Skeleton key={i} className="h-24 rounded-xl" />)
-        ) : searched && results.length === 0 ? (
-          <Card className="border-dashed border-gray-300">
-            <CardContent className="flex flex-col items-center justify-center py-16 text-gray-400">
-              <Search className="h-12 w-12 mb-3" />
-              <p className="text-lg font-medium">Sin resultados</p>
-              <p className="text-sm mt-1">Intentá con otros filtros</p>
-            </CardContent>
-          </Card>
-        ) : results.length > 0 ? (
-          <div className="space-y-3">
-            <p className="text-sm text-gray-500">{results.length} profesionales encontrados</p>
-            {results.map((pro) => (
-              <Card
-                key={pro.id}
-                className="border-0 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
-                onClick={() => setView('pro-profile', { proId: pro.id })}
-              >
-                <CardContent className="p-3 flex gap-3">
-                  <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                    {pro.avatar ? (
-                      <img
-                        src={pro.avatar}
-                        alt={pro.name}
-                        className="h-12 w-12 rounded-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-lg font-semibold text-blue-600">
-                        {pro.name?.charAt(0)?.toUpperCase() || '?'}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <p className="font-medium text-sm text-gray-900 truncate">
-                        {pro.name}
-                      </p>
-                      {pro.isVerified && (
-                        <span className="text-blue-500 text-xs">✓</span>
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-500 capitalize">
-                      {pro.profession}
-                      {pro.city && (
-                        <>
-                          {' '}
-                          <span className="text-gray-400">•</span> {pro.city}
-                        </>
-                      )}
-                    </p>
-                    {pro.bio && (
-                      <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{pro.bio}</p>
-                    )}
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="flex items-center gap-0.5">
-                        <Star className="h-3 w-3 text-amber-400 fill-amber-400" />
-                        <span className="text-xs font-medium text-gray-700">
-                          {pro.rating.toFixed(1)}
-                        </span>
-                      </div>
-                      <span className="text-xs text-gray-400">({pro.reviewCount})</span>
-                      {pro.hourlyRate && (
-                        <Badge
-                          variant="secondary"
-                          className="text-[10px] bg-green-50 text-green-700 px-1.5 py-0"
-                        >
-                          {formatPrice(pro.hourlyRate)}/h
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+        {/* Hourly Rate - PROMINENT TaskRabbit style */}
+        <div className="text-right shrink-0">
+          <div className="bg-green-50 border border-green-200 rounded-xl px-3 py-2">
+            <p className="text-sm font-bold text-green-700">{pro.hourlyRate ? formatBudget(pro.hourlyRate) : 'Consultar'}</p>
+            <p className="text-[9px] text-green-600 font-medium">por hora</p>
           </div>
-        ) : !searched ? (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-            <Search className="h-12 w-12 mb-3" />
-            <p className="text-lg font-medium">Buscá profesionales</p>
-            <p className="text-sm mt-1">
-              Escribí un nombre o seleccioná una profesión
-            </p>
-          </div>
-        ) : null}
-      </main>
+        </div>
+      </div>
 
-      <style jsx global>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
-    </div>
-  )
+      {/* Skills preview */}
+      {pro.skills && (
+        <div className="flex flex-wrap gap-1 mt-3 pt-2 border-t border-gray-50">
+          {pro.skills.split(',').slice(0, 4).map((skill, i) => (
+            <span key={i} className="px-2 py-0.5 rounded-md bg-gray-50 text-[9px] text-muted-foreground font-medium">{skill.trim()}</span>
+          ))}
+          {pro.skills.split(',').length > 4 && (
+            <span className="px-2 py-0.5 rounded-md bg-orange-50 text-[9px] text-orange-500 font-medium">+{pro.skills.split(',').length - 4}</span>
+          )}
+        </div>
+      )}
+    </button>
+  );
 }

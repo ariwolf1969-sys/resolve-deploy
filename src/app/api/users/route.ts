@@ -1,57 +1,60 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { db } from '@/lib/db';
+import { NextResponse } from 'next/server';
 
-// GET /api/users - list users (professionals only)
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(req.url)
-    const role = searchParams.get('role') || 'professional'
-    const profession = searchParams.get('profession')
-    const city = searchParams.get('city')
-    const search = searchParams.get('search')
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '20')
+    const users = await db.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        avatar: true,
+        bio: true,
+        location: true,
+        neighborhood: true,
+        verified: true,
+        ratingAvg: true,
+        ratingCount: true,
+        completedJobs: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
 
-    const where: Record<string, unknown> = { role }
+    return NextResponse.json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
+  }
+}
 
-    if (profession) where.profession = profession
-    if (city) where.city = { contains: city }
-    if (search) {
-      where.OR = [
-        { name: { contains: search } },
-        { profession: { contains: search } },
-        { bio: { contains: search } },
-      ]
+export async function POST(request: Request) {
+  try {
+    const body = await request.json();
+    const { name, phone, email, bio, location, neighborhood, lat, lng } = body;
+
+    if (!name || !phone) {
+      return NextResponse.json({ error: 'Name and phone are required' }, { status: 400 });
     }
 
-    const [users, total] = await Promise.all([
-      db.user.findMany({
-        where,
-        skip: (page - 1) * limit,
-        take: limit,
-        orderBy: { rating: 'desc' },
-        select: {
-          id: true,
-          name: true,
-          avatar: true,
-          role: true,
-          profession: true,
-          bio: true,
-          city: true,
-          province: true,
-          hourlyRate: true,
-          rating: true,
-          reviewCount: true,
-          isAvailable: true,
-          isVerified: true,
-        },
-      }),
-      db.user.count({ where }),
-    ])
+    const user = await db.user.create({
+      data: {
+        name,
+        phone,
+        email: email || null,
+        bio: bio || null,
+        location: location || null,
+        neighborhood: neighborhood || null,
+        lat: lat ? parseFloat(lat) : null,
+        lng: lng ? parseFloat(lng) : null,
+      }
+    });
 
-    return NextResponse.json({ users, total, page, limit })
-  } catch (error) {
-    console.error('Users list error:', error)
-    return NextResponse.json({ error: 'Error al obtener usuarios' }, { status: 500 })
+    return NextResponse.json(user, { status: 201 });
+  } catch (error: unknown) {
+    if (error && typeof error === 'object' && 'code' in error && (error as { code: string }).code === 'P2002') {
+      return NextResponse.json({ error: 'Phone number already registered' }, { status: 409 });
+    }
+    console.error('Error creating user:', error);
+    return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
   }
 }

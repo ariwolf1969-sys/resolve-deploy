@@ -1,83 +1,95 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { db } from '@/lib/db';
+import { NextRequest, NextResponse } from 'next/server';
 
-// GET /api/chat - list chat threads for a user
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url)
-    const userId = searchParams.get('userId')
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
 
     if (!userId) {
-      return NextResponse.json({ error: 'userId requerido' }, { status: 400 })
+      return NextResponse.json({ error: 'userId is required' }, { status: 400 });
     }
 
-    const threads = await db.chatThreadParticipant.findMany({
-      where: { userId },
-      include: {
-        thread: {
-          include: {
-            messages: {
-              orderBy: { createdAt: 'desc' },
-              take: 1,
-              include: {
-                sender: { select: { id: true, name: true, avatar: true } },
-              },
-            },
-            participants: {
-              include: {
-                user: { select: { id: true, name: true, avatar: true } },
-              },
-            },
-          },
-        },
+    const threads = await db.chatThread.findMany({
+      where: {
+        OR: [
+          { participant1Id: userId },
+          { participant2Id: userId }
+        ]
       },
-      orderBy: { lastReadAt: 'desc' },
-    })
+      include: {
+        need: {
+          select: { id: true, title: true, category: true }
+        },
+        participant1: {
+          select: { id: true, name: true, avatar: true }
+        },
+        participant2: {
+          select: { id: true, name: true, avatar: true }
+        },
+        _count: {
+          select: {
+            messages: {
+              where: { read: false, senderId: { not: userId } }
+            }
+          }
+        }
+      },
+      orderBy: { lastMessageAt: 'desc' },
+    });
 
-    // Transform to flat structure
-    const formattedThreads = threads.map((tp) => {
-      const otherParticipant = tp.thread.participants.find((p) => p.userId !== userId)
-      const lastMessage = tp.thread.messages[0]
-      return {
-        id: tp.thread.id,
-        otherUser: otherParticipant?.user,
-        lastMessage: lastMessage
-          ? { ...lastMessage, sender: lastMessage.sender }
-          : null,
-        unreadCount: 0, // Would need aggregation for real count
-        updatedAt: tp.thread.updatedAt,
-      }
-    })
+    const formattedThreads = threads.map(thread => ({
+      ...thread,
+      otherUser: thread.participant1Id === userId ? thread.participant2 : thread.participant1,
+      unreadCount: thread._count.messages,
+    }));
 
-    return NextResponse.json(formattedThreads)
+    return NextResponse.json(formattedThreads);
   } catch (error) {
-    console.error('Chat list error:', error)
-    return NextResponse.json({ error: 'Error al obtener chats' }, { status: 500 })
+    console.error('Error fetching chat threads:', error);
+    return NextResponse.json({ error: 'Failed to fetch chat threads' }, { status: 500 });
   }
 }
 
-// POST /api/chat - create a new chat thread
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const { participantIds } = await req.json()
+    const body = await request.json();
+    const { participant1Id, participant2Id, needId } = body;
 
-    if (!participantIds || participantIds.length < 2) {
-      return NextResponse.json({ error: 'Se requieren al menos 2 participantes' }, { status: 400 })
+    if (!participant1Id || !participant2Id) {
+      return NextResponse.json({ error: 'Both participant IDs are required' }, { status: 400 });
+    }
+
+    // Check if thread already exists
+    const existing = await db.chatThread.findFirst({
+      where: {
+        OR: [
+          { participant1Id, participant2Id },
+          { participant1Id: participant2Id, participant2Id: participant1Id }
+        ],
+        ...(needId ? { needId } : {})
+      }
+    });
+
+    if (existing) {
+      return NextResponse.json(existing);
     }
 
     const thread = await db.chatThread.create({
       data: {
-        participants: {
-          create: participantIds.map((userId: string) => ({
-            userId,
-          })),
-        },
+        participant1Id,
+        participant2Id,
+        needId: needId || null,
       },
-    })
+      include: {
+        participant1: { select: { id: true, name: true, avatar: true } },
+        participant2: { select: { id: true, name: true, avatar: true } },
+      }
+    });
 
-    return NextResponse.json(thread, { status: 201 })
+    return NextResponse.json(thread, { status: 201 });
   } catch (error) {
-    console.error('Create chat error:', error)
-    return NextResponse.json({ error: 'Error al crear chat' }, { status: 500 })
+    console.error('Error creating chat thread:', error);
+    return NextResponse.json({ error: 'Failed to create chat thread' }, { status: 500 });
   }
 }

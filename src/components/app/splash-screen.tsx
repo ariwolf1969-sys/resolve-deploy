@@ -1,350 +1,159 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useAppStore } from '@/store/app-store'
-import { Eye, EyeOff, Mail, Lock, User, Phone, Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
+import { useEffect, useState } from 'react';
+import { useAppStore } from '@/store/app-store';
 
-export default function SplashScreen() {
-  const [mode, setMode] = useState<'login' | 'register'>('login')
-  const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const { setUser, setToken, setView } = useAppStore()
+export function SplashScreen() {
+  const { setView } = useAppStore();
 
-  // Register fields
-  const [regName, setRegName] = useState('')
-  const [regEmail, setRegEmail] = useState('')
-  const [regPhone, setRegPhone] = useState('')
-  const [regPassword, setRegPassword] = useState('')
-  const [regConfirm, setRegConfirm] = useState('')
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setView('web-landing');
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [setView]);
 
-  // Login fields
-  const [loginEmail, setLoginEmail] = useState('')
-  const [loginPhone, setLoginPhone] = useState('')
-  const [loginPassword, setLoginPassword] = useState('')
-  const [loginMethod, setLoginMethod] = useState<'email' | 'phone'>('email')
+  return (
+    <div className="min-h-full flex flex-col items-center justify-center bg-gradient-to-br from-orange-500 to-orange-600 px-8">
+      <div className="w-24 h-24 bg-white rounded-3xl flex items-center justify-center shadow-xl mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-14 w-14 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
+      </div>
+      <h1 className="text-4xl font-bold text-white mb-2">Resolvé</h1>
+      <p className="text-orange-100 text-center text-base">
+        Lo que necesitás, cuando lo necesitás.
+      </p>
+      <div className="mt-8 flex gap-1">
+        <div className="w-2 h-2 rounded-full bg-white animate-bounce" style={{ animationDelay: '0ms' }} />
+        <div className="w-2 h-2 rounded-full bg-white/60 animate-bounce" style={{ animationDelay: '150ms' }} />
+        <div className="w-2 h-2 rounded-full bg-white/60 animate-bounce" style={{ animationDelay: '300ms' }} />
+      </div>
+    </div>
+  );
+}
 
-  const handleRegister = async () => {
-    if (!regName.trim()) return toast.error('Nombre requerido')
-    if (!regEmail.trim()) return toast.error('Email requerido')
-    if (!regPhone.trim()) {
-      return toast.error('Teléfono requerido')
-    }
-    const digits = regPhone.replace(/\D/g, '')
-    if (digits.length < 8 || digits.length > 11) {
-      return toast.error('El teléfono debe tener entre 8 y 11 dígitos')
-    }
-    if (regPassword.length < 6) return toast.error('Contraseña de al menos 6 caracteres')
-    if (regPassword !== regConfirm) return toast.error('Las contraseñas no coinciden')
+export function OnboardingScreen() {
+  const { setView, setCurrentUser } = useAppStore();
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [neighborhood, setNeighborhood] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    setLoading(true)
+  const handleSubmit = async () => {
+    if (!name.trim() || !phone.trim()) return;
+    setIsSubmitting(true);
+
     try {
-      const res = await fetch('/api/auth/register', {
+      const res = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: regName.trim(),
-          email: regEmail.trim(),
-          phone: regPhone.trim(),
-          password: regPassword,
-          role: 'user',
+          name: name.trim(),
+          phone: phone.trim(),
+          neighborhood: neighborhood.trim() || undefined,
+          lat: -34.6037 + (Math.random() - 0.5) * 0.05,
+          lng: -58.3816 + (Math.random() - 0.5) * 0.05,
         }),
-      })
-      const data = await res.json()
-      if (!res.ok) return toast.error(data.error)
+      });
 
-      // Auto login after register
-      const loginRes = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: regEmail.trim(), password: regPassword }),
-      })
-      const loginData = await loginRes.json()
-      if (loginData.token) {
-        setUser(loginData.user)
-        setToken(loginData.token)
-        toast.success('¡Cuenta creada exitosamente!')
-        setView('home')
+      if (res.ok) {
+        const user = await res.json();
+        setCurrentUser(user);
+        setView('home'); // After onboarding, go to app home
       }
-    } catch {
-      toast.error('Error de conexión')
-    } finally {
-      setLoading(false)
+    } catch (err) {
+      console.error(err);
     }
-  }
+    setIsSubmitting(false);
+  };
 
-  const handleLogin = async () => {
-    if (!loginPassword) return toast.error('Contraseña requerida')
-
-    if (loginMethod === 'email' && !loginEmail.trim()) {
-      return toast.error('Email requerido')
-    }
-
-    if (loginMethod === 'phone' && !loginPhone.trim()) {
-      return toast.error('Teléfono requerido')
-    }
-
-    if (loginMethod === 'phone') {
-      const digits = loginPhone.replace(/\D/g, '')
-      if (digits.length < 8 || digits.length > 11) {
-        return toast.error('El teléfono debe tener entre 8 y 11 dígitos')
-      }
-    }
-
-    setLoading(true)
+  const handleDemoLogin = async () => {
+    // Login as first demo user
     try {
-      const body =
-        loginMethod === 'email'
-          ? { email: loginEmail.trim(), password: loginPassword }
-          : { phone: loginPhone.trim(), password: loginPassword }
-
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-      const data = await res.json()
-      if (!res.ok) return toast.error(data.error)
-
-      setUser(data.user)
-      setToken(data.token)
-      toast.success('¡Bienvenido' + (data.user.name ? ', ' + data.user.name : '') + '!')
-      setView('home')
-    } catch {
-      toast.error('Error de conexión')
-    } finally {
-      setLoading(false)
+      const res = await fetch('/api/users');
+      const users = await res.json();
+      if (users.length > 0) {
+        setCurrentUser(users[0]);
+        setView('home'); // Demo login goes to app home
+      }
+    } catch (err) {
+      console.error(err);
     }
-  }
-
-  const PhoneInput = ({
-    value,
-    onChange,
-  }: {
-    value: string
-    onChange: (val: string) => void
-  }) => (
-    <div className="space-y-2">
-      <Label className="text-sm font-medium text-gray-700">Teléfono</Label>
-      <div className="flex items-center gap-2">
-        <div className="flex items-center h-10 px-3 bg-gray-100 border border-gray-200 rounded-l-md text-sm font-medium text-gray-600 shrink-0">
-          +54
-        </div>
-        <Input
-          type="tel"
-          inputMode="numeric"
-          placeholder="1155976414"
-          value={value}
-          onChange={(e) => {
-            // Allow only digits
-            const cleaned = e.target.value.replace(/\D/g, '')
-            if (cleaned.length <= 11) {
-              onChange(cleaned)
-            }
-          }}
-          className="rounded-l-none border-l-0"
-        />
-      </div>
-      <p className="text-xs text-gray-400">
-        Ingrese código de área + número (sin 0 ni 15)
-      </p>
-    </div>
-  )
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white tracking-tight">Resolvé</h1>
-          <p className="text-blue-100 mt-2 text-sm">
-            Encuentra profesionales de confianza en Argentina
-          </p>
+    <div className="min-h-full flex flex-col bg-background">
+      {/* Header */}
+      <div className="bg-gradient-to-br from-orange-500 to-orange-600 px-6 pt-12 pb-10 rounded-b-[2rem]">
+        <div className="flex items-center justify-center gap-2 mb-3">
+          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+          </div>
+          <span className="text-2xl font-bold text-white">Resolvé</span>
+        </div>
+        <p className="text-orange-100 text-center text-sm">
+          Conectamos personas que necesitan con personas que pueden ayudar.
+        </p>
+      </div>
+
+      {/* Form */}
+      <div className="flex-1 px-6 pt-8">
+        <h2 className="text-xl font-bold mb-1">Creá tu perfil</h2>
+        <p className="text-muted-foreground text-sm mb-6">Solo toma 30 segundos</p>
+
+        <div className="space-y-4">
+          <div>
+            <label className="text-sm font-medium mb-1.5 block">Tu nombre *</label>
+            <input
+              type="text"
+              placeholder="Ej: Maria Garcia"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium mb-1.5 block">Tu teléfono *</label>
+            <input
+              type="tel"
+              placeholder="Ej: +54 11 1234-5678"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium mb-1.5 block">Tu barrio</label>
+            <input
+              type="text"
+              placeholder="Ej: Palermo, Caballito..."
+              value={neighborhood}
+              onChange={(e) => setNeighborhood(e.target.value)}
+              className="w-full p-3.5 rounded-xl border border-gray-200 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+            />
+          </div>
         </div>
 
-        <Card className="shadow-xl border-0">
-          <CardHeader className="pb-2 px-6 pt-6">
-            <Tabs
-              value={mode}
-              onValueChange={(v) => setMode(v as 'login' | 'register')}
-            >
-              <TabsList className="w-full grid grid-cols-2">
-                <TabsTrigger value="login">Iniciar sesión</TabsTrigger>
-                <TabsTrigger value="register">Crear cuenta</TabsTrigger>
-              </TabsList>
+        <button
+          onClick={handleSubmit}
+          disabled={!name.trim() || !phone.trim() || isSubmitting}
+          className="w-full mt-8 bg-orange-500 text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
+        >
+          {isSubmitting ? 'Creando perfil...' : 'Comenzar'}
+        </button>
 
-              {/* LOGIN */}
-              <TabsContent value="login" className="space-y-4 mt-4">
-                <div className="flex gap-2 mb-4">
-                  <Button
-                    type="button"
-                    variant={loginMethod === 'email' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setLoginMethod('email')}
-                    className={
-                      loginMethod === 'email'
-                        ? 'flex-1 bg-blue-600 hover:bg-blue-700'
-                        : 'flex-1'
-                    }
-                  >
-                    <Mail className="h-4 w-4 mr-1" />
-                    Email
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={loginMethod === 'phone' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setLoginMethod('phone')}
-                    className={
-                      loginMethod === 'phone'
-                        ? 'flex-1 bg-blue-600 hover:bg-blue-700'
-                        : 'flex-1'
-                    }
-                  >
-                    <Phone className="h-4 w-4 mr-1" />
-                    Teléfono
-                  </Button>
-                </div>
-
-                {loginMethod === 'email' ? (
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-700">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        type="email"
-                        placeholder="tu@email.com"
-                        value={loginEmail}
-                        onChange={(e) => setLoginEmail(e.target.value)}
-                        className="pl-10"
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <PhoneInput value={loginPhone} onChange={setLoginPhone} />
-                )}
-
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Contraseña</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="••••••••"
-                      value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
-                      className="pl-10 pr-10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <Button
-                  onClick={handleLogin}
-                  disabled={loading}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                  Iniciar sesión
-                </Button>
-              </TabsContent>
-
-              {/* REGISTER */}
-              <TabsContent value="register" className="space-y-4 mt-4">
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Nombre completo</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input
-                      type="text"
-                      placeholder="Tu nombre"
-                      value={regName}
-                      onChange={(e) => setRegName(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input
-                      type="email"
-                      placeholder="tu@email.com"
-                      value={regEmail}
-                      onChange={(e) => setRegEmail(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-
-                <PhoneInput value={regPhone} onChange={setRegPhone} />
-
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Contraseña</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Mínimo 6 caracteres"
-                      value={regPassword}
-                      onChange={(e) => setRegPassword(e.target.value)}
-                      className="pl-10 pr-10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-gray-700">Confirmar contraseña</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Repetir contraseña"
-                      value={regConfirm}
-                      onChange={(e) => setRegConfirm(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-
-                <Button
-                  onClick={handleRegister}
-                  disabled={loading}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                  Crear cuenta
-                </Button>
-              </TabsContent>
-            </Tabs>
-          </CardHeader>
-          <CardContent className="px-6 pb-6">
-            <p className="text-center text-xs text-gray-400 mt-4">
-              Al continuar, aceptas nuestros Términos y Condiciones
-            </p>
-          </CardContent>
-        </Card>
+        <button
+          onClick={handleDemoLogin}
+          className="w-full mt-3 py-3.5 rounded-xl font-semibold text-sm text-orange-600 hover:bg-orange-50 transition-all"
+        >
+          Entrar como demo (ver datos de ejemplo)
+        </button>
       </div>
     </div>
-  )
+  );
 }

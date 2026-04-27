@@ -1,54 +1,149 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/lib/db';
 
-// GET /api/quotes/[id]
 export async function GET(
-  req: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params
+    const { id } = await params;
+
     const quote = await db.quote.findUnique({
       where: { id },
       include: {
-        sender: { select: { id: true, name: true, avatar: true, phone: true } },
-        receiver: { select: { id: true, name: true, avatar: true, profession: true, rating: true } },
+        provider: {
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+            email: true,
+            avatar: true,
+            profession: true,
+            ratingAvg: true,
+            completedJobs: true,
+            location: true,
+          },
+        },
+        client: {
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+            email: true,
+            avatar: true,
+            location: true,
+          },
+        },
+        need: true,
+        transactions: {
+          orderBy: { createdAt: 'desc' },
+        },
+        checkIns: {
+          orderBy: { createdAt: 'desc' },
+        },
+        disputes: {
+          orderBy: { createdAt: 'desc' },
+        },
       },
-    })
+    });
 
     if (!quote) {
-      return NextResponse.json({ error: 'Presupuesto no encontrado' }, { status: 404 })
+      return NextResponse.json(
+        { error: 'Quote not found' },
+        { status: 404 }
+      );
     }
 
-    return NextResponse.json(quote)
+    return NextResponse.json({ data: quote });
   } catch (error) {
-    console.error('Quote get error:', error)
-    return NextResponse.json({ error: 'Error al obtener presupuesto' }, { status: 500 })
+    console.error('Error fetching quote:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
 
-// PUT /api/quotes/[id] - update quote status
 export async function PUT(
-  req: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params
-    const data = await req.json()
-    const { status } = data
+    const { id } = await params;
+    const body = await request.json();
+    const { status, clientMessage } = body;
 
-    if (!status) {
-      return NextResponse.json({ error: 'Estado requerido' }, { status: 400 })
+    const validStatuses = ['accept', 'reject', 'complete', 'cancel'];
+    if (!status || !validStatuses.includes(status)) {
+      return NextResponse.json(
+        { error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` },
+        { status: 400 }
+      );
     }
 
-    const quote = await db.quote.update({
-      where: { id },
-      data: { status },
-    })
+    const quote = await db.quote.findUnique({ where: { id } });
 
-    return NextResponse.json(quote)
+    if (!quote) {
+      return NextResponse.json(
+        { error: 'Quote not found' },
+        { status: 404 }
+      );
+    }
+
+    const updateData: Record<string, unknown> = {};
+
+    switch (status) {
+      case 'accept':
+        updateData.status = 'accepted';
+        updateData.acceptedAt = new Date();
+        if (clientMessage) updateData.clientMessage = clientMessage;
+        break;
+      case 'reject':
+        updateData.status = 'rejected';
+        updateData.rejectedAt = new Date();
+        if (clientMessage) updateData.clientMessage = clientMessage;
+        break;
+      case 'complete':
+        updateData.status = 'completed';
+        updateData.completedAt = new Date();
+        break;
+      case 'cancel':
+        updateData.status = 'cancelled';
+        break;
+    }
+
+    const updatedQuote = await db.quote.update({
+      where: { id },
+      data: updateData,
+      include: {
+        provider: {
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+            email: true,
+            avatar: true,
+            profession: true,
+          },
+        },
+        client: {
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+            email: true,
+            avatar: true,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json({ data: updatedQuote });
   } catch (error) {
-    console.error('Quote update error:', error)
-    return NextResponse.json({ error: 'Error al actualizar presupuesto' }, { status: 500 })
+    console.error('Error updating quote:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

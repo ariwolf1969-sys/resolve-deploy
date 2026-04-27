@@ -1,7 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "@/components/ui/toaster";
+import { AppContainer } from "@/components/app/app-container";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,14 +14,19 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Resolvé - Profesionales de confianza en Argentina",
-  description: "Encontrá profesionales de confianza para tus necesidades. Electricistas, plomeros, albañiles y más.",
-  keywords: ["Resolvé", "profesionales", "Argentina", "servicios", "presupuestos"],
-  authors: [{ name: "Resolvé Team" }],
+  title: "Resolvé — Lo que necesitás, cuando lo necesitás",
+  description: "App de marketplace local para conectar personas que necesitan servicios con quienes pueden ayudar.",
   icons: {
-    icon: "/logo.svg",
+    icon: "/logo.png",
   },
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: "#F97316",
 };
 
 export default function RootLayout({
@@ -32,10 +37,9 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 text-foreground`}
       >
         {children}
-        <Toaster />
       </body>
     </html>
   );

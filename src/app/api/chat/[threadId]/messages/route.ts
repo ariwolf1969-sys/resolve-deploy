@@ -1,62 +1,63 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { db } from '@/lib/db';
+import { NextRequest, NextResponse } from 'next/server';
 
-// GET /api/chat/[threadId]/messages
 export async function GET(
-  req: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ threadId: string }> }
 ) {
   try {
-    const { threadId } = await params
+    const { threadId } = await params;
     const messages = await db.message.findMany({
       where: { threadId },
-      orderBy: { createdAt: 'asc' },
       include: {
-        sender: { select: { id: true, name: true, avatar: true } },
+        sender: { select: { id: true, name: true, avatar: true } }
       },
-    })
+      orderBy: { createdAt: 'asc' },
+    });
 
-    return NextResponse.json(messages)
+    return NextResponse.json(messages);
   } catch (error) {
-    console.error('Messages get error:', error)
-    return NextResponse.json({ error: 'Error al obtener mensajes' }, { status: 500 })
+    console.error('Error fetching messages:', error);
+    return NextResponse.json({ error: 'Failed to fetch messages' }, { status: 500 });
   }
 }
 
-// POST /api/chat/[threadId]/messages - send a message
 export async function POST(
-  req: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ threadId: string }> }
 ) {
   try {
-    const { threadId } = await params
-    const { content, senderId, type } = await req.json()
+    const { threadId } = await params;
+    const body = await request.json();
+    const { content, senderId } = body;
 
     if (!content || !senderId) {
-      return NextResponse.json({ error: 'Contenido y remitente requeridos' }, { status: 400 })
+      return NextResponse.json({ error: 'Content and senderId are required' }, { status: 400 });
     }
 
     const message = await db.message.create({
       data: {
         content,
-        senderId,
         threadId,
-        type: type || 'text',
+        senderId,
       },
       include: {
-        sender: { select: { id: true, name: true, avatar: true } },
-      },
-    })
+        sender: { select: { id: true, name: true, avatar: true } }
+      }
+    });
 
-    // Update thread timestamp
+    // Update thread last message
     await db.chatThread.update({
       where: { id: threadId },
-      data: { updatedAt: new Date() },
-    })
+      data: {
+        lastMessage: content,
+        lastMessageAt: new Date(),
+      }
+    });
 
-    return NextResponse.json(message, { status: 201 })
+    return NextResponse.json(message, { status: 201 });
   } catch (error) {
-    console.error('Message send error:', error)
-    return NextResponse.json({ error: 'Error al enviar mensaje' }, { status: 500 })
+    console.error('Error creating message:', error);
+    return NextResponse.json({ error: 'Failed to create message' }, { status: 500 });
   }
 }

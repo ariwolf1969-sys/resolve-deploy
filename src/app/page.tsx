@@ -1,12 +1,7 @@
-'use client'
+'use client';
 
-import dynamic from 'next/dynamic'
+import AppContainer from '@/components/app/app-container';
 
-const AppContainer = dynamic(
-  () => import('@/components/app/app-container'),
-  { ssr: false }
-)
-
-export default function Home() {
-  return <AppContainer />
+export default function Page() {
+  return <AppContainer />;
 }

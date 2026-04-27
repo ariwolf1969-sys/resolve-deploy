@@ -1,115 +1,102 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { db } from '@/lib/db';
+import { NextRequest, NextResponse } from 'next/server';
 
-// GET /api/users/[id]
 export async function GET(
-  req: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params
+    const { id } = await params;
     const user = await db.user.findUnique({
       where: { id },
       select: {
         id: true,
         name: true,
-        email: true,
         phone: true,
+        email: true,
         avatar: true,
-        role: true,
-        profession: true,
         bio: true,
-        city: true,
-        province: true,
-        address: true,
-        hourlyRate: true,
-        rating: true,
-        reviewCount: true,
-        isAvailable: true,
-        isVerified: true,
+        location: true,
+        neighborhood: true,
+        lat: true,
+        lng: true,
+        profession: true,
         skills: true,
         experience: true,
-        education: true,
-        certifications: true,
+        hourlyRate: true,
+        available: true,
+        verified: true,
+        dniVerified: true,
+        dniNumber: true,
+        ratingAvg: true,
+        ratingCount: true,
+        completedJobs: true,
         createdAt: true,
-        reviewCount: true,
-      },
-    })
+        needs: {
+          where: { status: { in: ['active', 'in_progress', 'completed'] } },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+          select: {
+            id: true,
+            title: true,
+            category: true,
+            status: true,
+            createdAt: true,
+          }
+        },
+        ratingsReceived: {
+          include: {
+            rater: { select: { id: true, name: true, avatar: true } }
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+        }
+      }
+    });
 
     if (!user) {
-      return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 })
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    return NextResponse.json({
-      ...user,
-      skills: user.skills ? JSON.parse(user.skills) : null,
-      certifications: user.certifications ? JSON.parse(user.certifications) : null,
-    })
+    return NextResponse.json(user);
   } catch (error) {
-    console.error('User get error:', error)
-    return NextResponse.json({ error: 'Error al obtener usuario' }, { status: 500 })
+    console.error('Error fetching user:', error);
+    return NextResponse.json({ error: 'Failed to fetch user' }, { status: 500 });
   }
 }
 
-// PUT /api/users/[id] - update user
-export async function PUT(
-  req: NextRequest,
+export async function PATCH(
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params
-    const data = await req.json()
-
-    // Handle phone formatting
-    if (data.phone) {
-      const digits = data.phone.replace(/\D/g, '')
-      if (digits.length >= 8 && digits.length <= 11) {
-        data.phone = '+54' + digits
-      }
-    }
-
-    // Stringify JSON fields
-    if (data.skills && Array.isArray(data.skills)) {
-      data.skills = JSON.stringify(data.skills)
-    }
-    if (data.certifications && Array.isArray(data.certifications)) {
-      data.certifications = JSON.stringify(data.certifications)
-    }
+    const { id } = await params;
+    const body = await request.json();
 
     const user = await db.user.update({
       where: { id },
-      data,
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        avatar: true,
-        role: true,
-        profession: true,
-        bio: true,
-        city: true,
-        province: true,
-        address: true,
-        hourlyRate: true,
-        rating: true,
-        reviewCount: true,
-        isAvailable: true,
-        isVerified: true,
-        skills: true,
-        experience: true,
-        education: true,
-        certifications: true,
-      },
-    })
+      data: {
+        ...(body.name !== undefined && { name: body.name }),
+        ...(body.bio !== undefined && { bio: body.bio }),
+        ...(body.location !== undefined && { location: body.location }),
+        ...(body.neighborhood !== undefined && { neighborhood: body.neighborhood }),
+        ...(body.avatar !== undefined && { avatar: body.avatar }),
+        ...(body.profession !== undefined && { profession: body.profession }),
+        ...(body.skills !== undefined && { skills: body.skills }),
+        ...(body.experience !== undefined && { experience: body.experience }),
+        ...(body.hourlyRate !== undefined && { hourlyRate: body.hourlyRate }),
+        ...(body.available !== undefined && { available: body.available }),
+        ...(body.verified !== undefined && { verified: body.verified }),
+        ...(body.dniVerified !== undefined && { dniVerified: body.dniVerified }),
+        ...(body.dniNumber !== undefined && { dniNumber: body.dniNumber }),
+        ...(body.dniPhotoUrl !== undefined && { dniPhotoUrl: body.dniPhotoUrl }),
+        ...(body.selfieDniUrl !== undefined && { selfieDniUrl: body.selfieDniUrl }),
+      }
+    });
 
-    return NextResponse.json({
-      ...user,
-      skills: user.skills ? JSON.parse(user.skills) : null,
-      certifications: user.certifications ? JSON.parse(user.certifications) : null,
-    })
+    return NextResponse.json(user);
   } catch (error) {
-    console.error('User update error:', error)
-    return NextResponse.json({ error: 'Error al actualizar usuario' }, { status: 500 })
+    console.error('Error updating user:', error);
+    return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
   }
 }
