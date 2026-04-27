@@ -38,3 +38,28 @@ Stage Summary:
 - Providers can also act as clients (they get both capabilities)
 - "Pagos 100% seguros" header icon now has same hover animation as sub-cards
 - Backup snapshot saved for disaster recovery
+
+---
+Task ID: 1
+Agent: Main Agent
+Task: Fix registration error, login route, and all UI issues reported by user
+
+Work Log:
+- Installed bcryptjs + @types/bcryptjs (was missing from package.json - root cause of "Error al registrar usuario")
+- Fixed login API route: removed references to non-existent fields (user.address, user.rating, user.reviewCount, user.isAvailable, user.isVerified, user.education, user.certifications)
+- Fixed login API route: corrected to use actual schema fields (ratingAvg, ratingCount, available, verified, etc.)
+- Rewrote web-landing-screen.tsx with all UI fixes:
+  - Mobile auth buttons (Ingresar/Creá tu cuenta) now always visible on small screens
+  - Added hamburger menu for mobile navigation links
+  - Trust section: reorganized as 5-pillar grid (Pagos seguros as featured blue card + 4 pillars)
+  - Responsive grid: 1 col mobile, 2 cols tablet, 5 cols desktop for trust pillars
+  - Service categories (oficios) moved up above "How it works" section for visibility
+  - Added active:bg-blue-50 for touch feedback on mobile
+  - Added floating CTA button on mobile for registration
+- Pushed to both resolve-app and resolve-deploy repos for Vercel deployment
+
+Stage Summary:
+- Registration error root cause: bcryptjs not in package.json dependencies
+- Login error root cause: referencing fields that don't exist in Prisma schema
+- Vercel should auto-deploy from resolve-deploy repo
+- All UI fixes committed in 813781d
