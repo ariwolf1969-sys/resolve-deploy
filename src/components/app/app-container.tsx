@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useAppStore } from '@/store/app-store';
 import { SplashScreen, OnboardingScreen } from '@/components/app/splash-screen';
 import { HomeScreen } from '@/components/app/home-screen';
@@ -23,6 +23,45 @@ import { CheckInScreen } from '@/components/app/check-in-screen';
 import { DisputeScreen } from '@/components/app/dispute-screen';
 import { AnimatePresence, motion } from 'framer-motion';
 import { buildAffiliateUrl } from '@/lib/affiliate';
+import { ARGENTINA_PROVINCES, getCitiesByProvince, isCaba, searchCities } from '@/lib/argentina-locations';
+
+// Helper: compress image before upload
+async function compressImage(file: File, maxWidth: number, maxHeight: number, quality: number): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxWidth || height > maxHeight) {
+        const ratio = Math.min(maxWidth / width, maxHeight / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) { reject(new Error('No canvas context')); return; }
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob(
+        (blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error('Failed to compress image'));
+        },
+        'image/jpeg',
+        quality,
+      );
+    };
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+// Helper: upgrade ML image URL to higher quality
+function upgradeImageUrl(url: string): string {
+  if (!url) return url;
+  // ML thumbnail URLs: replace -O.jpg or -O.png with -W.jpg (1200x1200)
+  return url.replace(/-O\.(jpg|jpeg|png|webp)$/i, '-W.jpg');
+}
 
 const pageVariants = {
   initial: { opacity: 0, x: 20 },
@@ -94,18 +133,33 @@ function EditProfileScreen() {
   const { setView, currentUser, setCurrentUser } = useAppStore();
   const [name, setName] = useState(currentUser?.name || '');
   const [phone, setPhone] = useState(currentUser?.phone ? currentUser.phone.replace('+54', '') : '');
-  const [neighborhood, setNeighborhood] = useState(currentUser?.neighborhood || currentUser?.city || '');
+  const [province, setProvince] = useState(currentUser?.province || '');
+  const [city, setCity] = useState(currentUser?.city || '');
+  const [neighborhood, setNeighborhood] = useState(currentUser?.neighborhood || '');
+  const [neighborhoodQuery, setNeighborhoodQuery] = useState(currentUser?.neighborhood || '');
   const [bio, setBio] = useState(currentUser?.bio || '');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [showNeighborhoodDropdown, setShowNeighborhoodDropdown] = useState(false);
+  const neighborhoodRef = useRef<HTMLDivElement>(null);
+
+  const cities = useMemo(() => getCitiesByProvince(province), [province]);
+  const neighborhoods = useMemo(() => (city && province ? searchCities(province, neighborhoodQuery) : []), [city, province, neighborhoodQuery]);
+  const showNeighborhoodField = province && city && !isCaba(province);
 
   const handleSave = async () => {
     if (!name.trim()) return;
     setSaving(true);
     try {
       const phoneDigits = phone.replace(/\D/g, '');
-      const updates: Record<string, unknown> = { name: name.trim(), neighborhood: neighborhood.trim() || null, bio: bio.trim() || null };
+      const updates: Record<string, unknown> = {
+        name: name.trim(),
+        province: province.trim() || null,
+        city: city.trim() || null,
+        neighborhood: neighborhood.trim() || null,
+        bio: bio.trim() || null,
+      };
       if (phoneDigits.length >= 8) {
         updates.phone = '+54' + phoneDigits;
       }
@@ -138,9 +192,11 @@ function EditProfileScreen() {
         return;
       }
       setUploadingPhoto(true);
-      const formData = new FormData();
-      formData.append('avatar', file);
       try {
+        // Compress image before upload (max 400x400, JPEG 0.8 quality)
+        const compressed = await compressImage(file, 400, 400, 0.8);
+        const formData = new FormData();
+        formData.append('avatar', new File([compressed], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }));
         const res = await fetch(`/api/users/${currentUser?.id}/avatar`, {
           method: 'POST',
           body: formData,
@@ -217,9 +273,82 @@ function EditProfileScreen() {
           <p className="text-[10px] text-muted-foreground mt-1">Código de área + número (sin 0 ni 15)</p>
         </div>
         <div>
-          <label className="text-sm font-medium text-muted-foreground mb-1 block">Barrio / Ciudad</label>
-          <input type="text" value={neighborhood} onChange={(e) => setNeighborhood(e.target.value)} className="w-full p-3 rounded-lg border bg-background text-sm" placeholder="Ej: Palermo" />
+          <label className="text-sm font-medium text-muted-foreground mb-1 block">Provincia</label>
+          <select
+            value={province}
+            onChange={(e) => {
+              setProvince(e.target.value);
+              setCity('');
+              setNeighborhood('');
+              setNeighborhoodQuery('');
+            }}
+            className="w-full p-3 rounded-lg border bg-background text-sm"
+          >
+            <option value="">Seleccioná tu provincia</option>
+            {ARGENTINA_PROVINCES.map(p => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+          </select>
         </div>
+        {province && (
+          <div>
+            <label className="text-sm font-medium text-muted-foreground mb-1 block">{isCaba(province) ? 'Barrio *' : 'Ciudad *'}</label>
+            <select
+              value={city}
+              onChange={(e) => {
+                setCity(e.target.value);
+                if (isCaba(province)) {
+                  setNeighborhood(e.target.value);
+                } else {
+                  setNeighborhood('');
+                  setNeighborhoodQuery('');
+                }
+              }}
+              className="w-full p-3 rounded-lg border bg-background text-sm"
+            >
+              <option value="">{isCaba(province) ? 'Seleccioná tu barrio' : 'Seleccioná tu ciudad'}</option>
+              {cities.map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+        )}
+        {showNeighborhoodField && (
+          <div ref={neighborhoodRef} className="relative">
+            <label className="text-sm font-medium text-muted-foreground mb-1 block">Barrio</label>
+            <input
+              type="text"
+              placeholder="Buscá o seleccioná tu barrio..."
+              value={neighborhoodQuery}
+              onChange={(e) => {
+                setNeighborhoodQuery(e.target.value);
+                setNeighborhood(e.target.value);
+                setShowNeighborhoodDropdown(true);
+              }}
+              onFocus={() => setShowNeighborhoodDropdown(true)}
+              onBlur={() => setTimeout(() => setShowNeighborhoodDropdown(false), 200)}
+              className="w-full p-3 rounded-lg border bg-background text-sm"
+            />
+            {showNeighborhoodDropdown && neighborhoods.length > 0 && (
+              <div className="absolute z-20 top-full mt-1 w-full max-h-48 overflow-y-auto rounded-lg border bg-white shadow-lg">
+                {neighborhoods.filter(n => n.toLowerCase() !== neighborhoodQuery.toLowerCase()).slice(0, 10).map(n => (
+                  <button
+                    key={n}
+                    type="button"
+                    onMouseDown={() => {
+                      setNeighborhood(n);
+                      setNeighborhoodQuery(n);
+                      setShowNeighborhoodDropdown(false);
+                    }}
+                    className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors"
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
         {currentUser?.profession && (
           <div>
             <label className="text-sm font-medium text-muted-foreground mb-1 block">Sobre mí</label>
@@ -275,8 +404,20 @@ function ProductDetailScreen() {
     shein: 'SHEIN',
   };
 
-  const formatPrice = (price: number) =>
-    new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(price);
+  // Derive display image URL with upgrade + fallback
+  const displayImageUrl = (() => {
+    const upgraded = selectedProduct.imageUrl ? upgradeImageUrl(selectedProduct.imageUrl) : '';
+    if (upgraded) return upgraded;
+    // Try to extract image from sourceUrl (ML product pages)
+    if (selectedProduct.sourceUrl && selectedProduct.sourceUrl.includes('mercadolibre')) {
+      // Try to extract ML ID and construct image URL
+      const mlMatch = selectedProduct.sourceUrl.match(/MLA(\d+)/);
+      if (mlMatch) {
+        return `https://http2.mlstatic.com/D_${mlMatch[0]}-O.jpg`;
+      }
+    }
+    return '';
+  })();
 
   return (
     <div className="min-h-full bg-white">
@@ -292,18 +433,23 @@ function ProductDetailScreen() {
 
       {/* Product Image */}
       <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative">
-        {selectedProduct.imageUrl ? (
+        {displayImageUrl ? (
           <img
-            src={selectedProduct.imageUrl}
+            src={displayImageUrl}
             alt={selectedProduct.title}
             className="h-full w-full object-contain"
           />
         ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-            <rect x="2" y="2" width="20" height="20" rx="2" />
-            <circle cx="8.5" cy="8.5" r="1.5" />
-            <path d="m21 15-5-5L5 21" />
-          </svg>
+          <div className="flex flex-col items-center gap-3 p-6">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+              <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7" />
+              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+              <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4" />
+              <path d="M2 7h20" />
+              <path d="M22 7v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7" />
+            </svg>
+            <p className="text-sm font-medium text-gray-400 text-center line-clamp-3 max-w-[200px]">{selectedProduct.title}</p>
+          </div>
         )}
         {discount > 0 && (
           <div className="absolute top-3 left-3 bg-green-500 text-white px-2 py-1 rounded-full text-sm font-bold">

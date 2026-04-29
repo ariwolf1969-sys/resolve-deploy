@@ -34,6 +34,12 @@ const SOURCE_BADGES = [
   { name: 'SHEIN', color: 'bg-pink-50 text-pink-700 border-pink-200' },
 ];
 
+function upgradeImageUrl(url: string): string {
+  if (!url) return url;
+  // ML thumbnail URLs: replace -O.jpg or -O.png with -W.jpg (1200x1200)
+  return url.replace(/-O\.(jpg|jpeg|png|webp)$/i, '-W.jpg');
+}
+
 function formatPrice(price: number) {
   return new Intl.NumberFormat('es-AR', {
     style: 'currency',
@@ -73,7 +79,7 @@ function ProductCard({ product, setView, setSelectedProduct }: {
         <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
           {product.imageUrl ? (
             <img
-              src={product.imageUrl}
+              src={upgradeImageUrl(product.imageUrl)}
               alt={product.title}
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
               loading="lazy"
@@ -161,8 +167,41 @@ export function WebLandingScreen() {
             return;
           }
         }
-        // Trigger a sync in the background
+
+        // DB is empty: trigger sync in background AND fetch directly from ML API
         fetch('/api/products/sync', { method: 'GET' }).catch(() => {});
+
+        try {
+          const mlRes = await fetch('https://api.mercadolibre.com/sites/MLA/search?q=celulares+smartphones&condition=new&shipping=free&limit=20');
+          if (mlRes.ok) {
+            const mlData = await mlRes.json();
+            if (mlData.results && mlData.results.length > 0) {
+              const mlProducts: AffiliateProduct[] = mlData.results.slice(0, 20).map((item: any) => ({
+                id: String(item.id),
+                title: item.title || 'Sin título',
+                price: item.price || 0,
+                originalPrice: item.original_price || undefined,
+                currency: item.currency_id || 'ARS',
+                imageUrl: item.thumbnail || '',
+                sourceUrl: item.permalink || '',
+                source: 'mercadolibre',
+                category: item.category_id || '',
+                brand: item.attributes?.find((a: any) => a.id === 'BRAND')?.value_name || undefined,
+                rating: item.review?.rating_average || undefined,
+                reviewCount: item.review?.total || 0,
+                commission: 5,
+                active: true,
+                description: '',
+              }));
+              setProducts(mlProducts);
+              setProductsLoaded(true);
+              return;
+            }
+          }
+        } catch (mlErr) {
+          console.error('Error fetching from ML API:', mlErr);
+        }
+
         setProductsLoaded(false);
       } catch (err) {
         console.error('Error loading products:', err);

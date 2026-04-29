@@ -30,7 +30,8 @@ export function SearchOverlay() {
   };
 
   const searchProfessionals = useCallback(async (q: string) => {
-    if (q.length < 2) { setProfessionals([]); return; }
+    const hasLocationFilter = selectedProvince || selectedCity || selectedWorkZone;
+    if (q.length < 2 && !hasLocationFilter) { setProfessionals([]); return; }
     setIsSearching(true);
     try {
       const params = new URLSearchParams();
@@ -47,9 +48,10 @@ export function SearchOverlay() {
   }, [sortBy, selectedProvince, selectedCity, selectedWorkZone]);
 
   useEffect(() => {
-    if (query.length >= 2) searchProfessionals(query);
+    const hasLocationFilter = selectedProvince || selectedCity || selectedWorkZone;
+    if (query.length >= 2 || hasLocationFilter) searchProfessionals(query);
     else setProfessionals([]);
-  }, [query, sortBy, searchProfessionals]);
+  }, [query, sortBy, selectedProvince, selectedCity, selectedWorkZone, searchProfessionals]);
 
   const handleProfessionClick = async (profession: string) => {
     setQuery(profession);
@@ -176,7 +178,7 @@ export function SearchOverlay() {
       </div>
 
       <div className="px-4 py-3">
-        {query.length < 2 ? (
+        {query.length < 2 && !selectedProvince && !selectedCity && !selectedWorkZone ? (
           <div>
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Busc&#xE1; por profesi&#xF3;n</h3>
             <div className="grid grid-cols-3 gap-2">
@@ -202,7 +204,7 @@ export function SearchOverlay() {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
             </div>
             <h3 className="font-semibold mb-1">Sin resultados</h3>
-            <p className="text-sm text-muted-foreground">No encontramos profesionales para &quot;{query}&quot;</p>
+            <p className="text-sm text-muted-foreground">{query ? `No encontramos profesionales para "${query}"` : 'No encontramos profesionales en esta ubicación'}</p>
           </div>
         ) : (
           <>
