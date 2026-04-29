@@ -36,8 +36,18 @@ const SOURCE_BADGES = [
 
 function upgradeImageUrl(url: string): string {
   if (!url) return url;
-  // ML thumbnail URLs: replace -O.jpg or -O.png with -W.jpg (1200x1200)
-  return url.replace(/-O\.(jpg|jpeg|png|webp)$/i, '-W.jpg');
+  if (!url.includes('mlstatic.com')) return url;
+  // ML 2X retina thumbnails: D_NQ_NP_2X_XXXXX-O.jpg → remove 2X_ and use -W
+  let upgraded = url.replace(/_2X_/, '_').replace(/-O\.(jpg|jpeg|png|webp)$/i, '-W.jpg');
+  // ML standard thumbnails: D_XXXXX-O.jpg → -W.jpg (1200x1200)
+  if (upgraded === url) {
+    upgraded = url.replace(/-O\.(jpg|jpeg|png|webp)$/i, '-W.jpg');
+  }
+  // ML -I.jpg (original) → -W.jpg for consistency
+  if (upgraded === url) {
+    upgraded = url.replace(/-I\.(jpg|jpeg|png|webp)$/i, '-W.jpg');
+  }
+  return upgraded;
 }
 
 function formatPrice(price: number) {
@@ -172,31 +182,54 @@ export function WebLandingScreen() {
         fetch('/api/products/sync', { method: 'GET' }).catch(() => {});
 
         try {
-          const mlRes = await fetch('https://api.mercadolibre.com/sites/MLA/search?q=celulares+smartphones&condition=new&shipping=free&limit=20');
-          if (mlRes.ok) {
-            const mlData = await mlRes.json();
-            if (mlData.results && mlData.results.length > 0) {
-              const mlProducts: AffiliateProduct[] = mlData.results.slice(0, 20).map((item: any) => ({
-                id: String(item.id),
-                title: item.title || 'Sin título',
-                price: item.price || 0,
-                originalPrice: item.original_price || undefined,
-                currency: item.currency_id || 'ARS',
-                imageUrl: item.thumbnail || '',
-                sourceUrl: item.permalink || '',
-                source: 'mercadolibre',
-                category: item.category_id || '',
-                brand: item.attributes?.find((a: any) => a.id === 'BRAND')?.value_name || undefined,
-                rating: item.review?.rating_average || undefined,
-                reviewCount: item.review?.total || 0,
-                commission: 5,
-                active: true,
-                description: '',
-              }));
-              setProducts(mlProducts);
-              setProductsLoaded(true);
-              return;
+          // Fetch from multiple categories for variety
+          const mlCategories = [
+            'celulares smartphones',
+            'auriculares bluetooth inalambricos',
+            'zapatillas deportivas running',
+            'herramientas eléctricas taladro',
+          ];
+          const mlFetches = mlCategories.map(query =>
+            fetch(`https://api.mercadolibre.com/sites/MLA/search?q=${encodeURIComponent(query)}&condition=new&shipping=free&limit=8`)
+              .then(res => res.ok ? res.json() : null)
+              .catch(() => null)
+          );
+          const mlResults = await Promise.all(mlFetches);
+          const allMlProducts: AffiliateProduct[] = [];
+
+          for (const mlData of mlResults) {
+            if (mlData?.results?.length) {
+              for (const item of mlData.results.slice(0, 8)) {
+                // Use highest quality picture if available
+                const rawImage = item.pictures?.[0]?.secure_url || item.thumbnail || '';
+                allMlProducts.push({
+                  id: String(item.id),
+                  title: item.title || 'Sin título',
+                  price: item.price || 0,
+                  originalPrice: item.original_price || undefined,
+                  currency: item.currency_id || 'ARS',
+                  imageUrl: rawImage,
+                  sourceUrl: item.permalink || '',
+                  source: 'mercadolibre',
+                  category: item.category_id || '',
+                  brand: item.attributes?.find((a: any) => a.id === 'BRAND')?.value_name || undefined,
+                  rating: item.review?.rating_average || undefined,
+                  reviewCount: item.review?.total || 0,
+                  commission: 5,
+                  active: true,
+                  featured: false,
+                  description: '',
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                });
+              }
             }
+          }
+
+          if (allMlProducts.length > 0) {
+            setProducts(allMlProducts);
+            setProductsLoaded(true);
+            return;
           }
         } catch (mlErr) {
           console.error('Error fetching from ML API:', mlErr);

@@ -23,7 +23,16 @@ import { CheckInScreen } from '@/components/app/check-in-screen';
 import { DisputeScreen } from '@/components/app/dispute-screen';
 import { AnimatePresence, motion } from 'framer-motion';
 import { buildAffiliateUrl } from '@/lib/affiliate';
-import { ARGENTINA_PROVINCES, getCitiesByProvince, isCaba, searchCities } from '@/lib/argentina-locations';
+import { ARGENTINA_PROVINCES, getCitiesByProvince, isCaba } from '@/lib/argentina-locations';
+
+// Helper: format ARS price
+function formatPrice(price: number): string {
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+    maximumFractionDigits: 0,
+  }).format(price);
+}
 
 // Helper: compress image before upload
 async function compressImage(file: File, maxWidth: number, maxHeight: number, quality: number): Promise<Blob> {
@@ -59,8 +68,18 @@ async function compressImage(file: File, maxWidth: number, maxHeight: number, qu
 // Helper: upgrade ML image URL to higher quality
 function upgradeImageUrl(url: string): string {
   if (!url) return url;
-  // ML thumbnail URLs: replace -O.jpg or -O.png with -W.jpg (1200x1200)
-  return url.replace(/-O\.(jpg|jpeg|png|webp)$/i, '-W.jpg');
+  if (!url.includes('mlstatic.com')) return url;
+  // ML 2X retina thumbnails: D_NQ_NP_2X_XXXXX-O.jpg → remove 2X_ and use -W
+  let upgraded = url.replace(/_2X_/, '_').replace(/-O\.(jpg|jpeg|png|webp)$/i, '-W.jpg');
+  // ML standard thumbnails: D_XXXXX-O.jpg → -W.jpg (1200x1200)
+  if (upgraded === url) {
+    upgraded = url.replace(/-O\.(jpg|jpeg|png|webp)$/i, '-W.jpg');
+  }
+  // ML -I.jpg (original) → -W.jpg for consistency
+  if (upgraded === url) {
+    upgraded = url.replace(/-I\.(jpg|jpeg|png|webp)$/i, '-W.jpg');
+  }
+  return upgraded;
 }
 
 const pageVariants = {
@@ -145,7 +164,12 @@ function EditProfileScreen() {
   const neighborhoodRef = useRef<HTMLDivElement>(null);
 
   const cities = useMemo(() => getCitiesByProvince(province), [province]);
-  const neighborhoods = useMemo(() => (city && province ? searchCities(province, neighborhoodQuery) : []), [city, province, neighborhoodQuery]);
+  const neighborhoods = useMemo(() => {
+    if (!city || !province) return [];
+    const q = neighborhoodQuery.toLowerCase();
+    if (!q) return getCitiesByProvince(province);
+    return getCitiesByProvince(province).filter(c => c.toLowerCase().includes(q));
+  }, [city, province, neighborhoodQuery]);
   const showNeighborhoodField = province && city && !isCaba(province);
 
   const handleSave = async () => {
@@ -204,9 +228,15 @@ function EditProfileScreen() {
         if (res.ok) {
           const data = await res.json();
           setCurrentUser({ ...currentUser!, avatar: data.avatarUrl });
+          setSaved(true);
+          setTimeout(() => setSaved(false), 2000);
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          alert(errData.error || 'Error al subir la imagen. Intentá de nuevo.');
         }
       } catch (err) {
-        console.error(err);
+        console.error('Photo upload error:', err);
+        alert('Error de conexión al subir la imagen.');
       }
       setUploadingPhoto(false);
     };
@@ -410,11 +440,15 @@ function ProductDetailScreen() {
     if (upgraded) return upgraded;
     // Try to extract image from sourceUrl (ML product pages)
     if (selectedProduct.sourceUrl && selectedProduct.sourceUrl.includes('mercadolibre')) {
-      // Try to extract ML ID and construct image URL
+      // Try to extract ML ID and construct high-quality image URL
       const mlMatch = selectedProduct.sourceUrl.match(/MLA(\d+)/);
       if (mlMatch) {
-        return `https://http2.mlstatic.com/D_${mlMatch[0]}-O.jpg`;
+        return `https://http2.mlstatic.com/D_${mlMatch[0]}-W.jpg`;
       }
+    }
+    // For other sources, try using the sourceUrl as-is if it's an image URL
+    if (selectedProduct.imageUrl && selectedProduct.imageUrl.startsWith('http')) {
+      return selectedProduct.imageUrl;
     }
     return '';
   })();

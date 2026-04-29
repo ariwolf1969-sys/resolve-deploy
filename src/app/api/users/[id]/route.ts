@@ -98,6 +98,14 @@ export async function PATCH(
         ...(body.province !== undefined && { province: body.province }),
         ...(body.city !== undefined && { city: body.city }),
         ...(body.workZone !== undefined && { workZone: body.workZone }),
+      },
+      select: {
+        id: true, name: true, phone: true, email: true, avatar: true,
+        bio: true, location: true, neighborhood: true, province: true,
+        city: true, workZone: true, lat: true, lng: true, profession: true,
+        skills: true, experience: true, hourlyRate: true, available: true,
+        verified: true, dniVerified: true, dniNumber: true, ratingAvg: true,
+        ratingCount: true, completedJobs: true, createdAt: true,
       }
     });
 
