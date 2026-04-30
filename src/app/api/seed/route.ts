@@ -790,7 +790,6 @@ export async function POST() {
       message: 'Database seeded with professionals demo data',
       professionalCount: users.length,
       needCount: needs.length,
-      productCount: products.length,
       quoteCount: quotes.length,
       transactionCount: transactions.length,
       checkInCount: checkIns.length,

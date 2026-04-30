@@ -53,6 +53,7 @@ model User {
   ratingsGiven     Rating[]      @relation("Rater")
   responses        Response[]
   transactions     Transaction[]
+  notifications    Notification[]
 }
 
 model Need {
@@ -127,46 +128,6 @@ model Rating {
   need      Need?    @relation(fields: [needId], references: [id])
   rated     User     @relation("Rated", fields: [ratedId], references: [id])
   rater     User     @relation("Rater", fields: [raterId], references: [id])
-}
-
-model AffiliateProduct {
-  id            String           @id @default(cuid())
-  title         String
-  description   String?
-  price         Float
-  originalPrice Float?
-  currency      String           @default("ARS")
-  imageUrl      String?
-  sourceUrl     String
-  affiliateUrl  String?
-  source        String
-  externalId    String?          @unique
-  category      String
-  categoryPath  String?
-  brand         String?
-  seller        String?
-  rating        Float?
-  reviewCount   Int              @default(0)
-  soldQuantity  Int              @default(0)
-  commission    Float            @default(0)
-  active        Boolean          @default(true)
-  featured      Boolean          @default(false)
-  syncedAt      DateTime?
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  clicks        AffiliateClick[]
-}
-
-model AffiliateClick {
-  id        String           @id @default(cuid())
-  productId String
-  sessionId String?
-  ip        String?
-  userAgent String?
-  referrer  String?
-  converted Boolean          @default(false)
-  createdAt DateTime         @default(now())
-  product   AffiliateProduct @relation(fields: [productId], references: [id])
 }
 
 model Quote {
@@ -251,4 +212,19 @@ model Dispute {
   against     User      @relation("DisputeReceiver", fields: [againstId], references: [id])
   filedBy     User      @relation("DisputeFiler", fields: [filedById], references: [id])
   quote       Quote     @relation(fields: [quoteId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+ userId    String
+ title     String
+ message   String
+ type      String   @default("system") // quote_accepted, payment_received, new_message, check_in, dispute, system
+ read      Boolean  @default(false)
+ link      String?
+ createdAt DateTime @default(now())
+ user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
 }

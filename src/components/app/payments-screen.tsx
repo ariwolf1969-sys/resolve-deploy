@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAppStore, type Transaction } from '@/store/app-store';
 import {
   ArrowLeft,
@@ -8,107 +8,20 @@ import {
   Lock,
   Eye,
   CreditCard,
-  Banknote,
-  Smartphone,
   ChevronRight,
   Clock,
   CheckCircle,
   XCircle,
   RotateCcw,
   AlertTriangle,
+  ExternalLink,
+  Loader2,
+  QrCode,
+  Smartphone,
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 type TabFilter = 'all' | 'held' | 'released' | 'refunded';
-
-const demoTransactions: (Transaction & { quoteTitle: string; counterparty: string })[] = [
-  {
-    id: 'txn_001',
-    quoteId: 'q_001',
-    amount: 85000,
-    currency: 'ARS',
-    platformFee: 6800,
-    status: 'held',
-    paymentMethod: 'credit_card',
-    paymentRef: 'VISA-****4242',
-    createdAt: '2025-01-15T10:30:00Z',
-    updatedAt: '2025-01-15T10:30:00Z',
-    quoteTitle: 'Reparación de cañería en cocina',
-    counterparty: 'Carlos Méndez',
-  },
-  {
-    id: 'txn_002',
-    quoteId: 'q_002',
-    amount: 120000,
-    currency: 'ARS',
-    platformFee: 9600,
-    status: 'released',
-    paymentMethod: 'transfer',
-    paymentRef: 'TRF-2025-001',
-    releasedAt: '2025-01-18T14:00:00Z',
-    createdAt: '2025-01-16T09:00:00Z',
-    updatedAt: '2025-01-18T14:00:00Z',
-    quoteTitle: 'Pintura completa del departamento',
-    counterparty: 'María García',
-  },
-  {
-    id: 'txn_003',
-    quoteId: 'q_003',
-    amount: 45000,
-    currency: 'ARS',
-    platformFee: 3600,
-    status: 'refunded',
-    paymentMethod: 'credit_card',
-    paymentRef: 'MC-****8888',
-    refundedAt: '2025-01-20T11:00:00Z',
-    createdAt: '2025-01-17T16:00:00Z',
-    updatedAt: '2025-01-20T11:00:00Z',
-    quoteTitle: 'Instalación de aire acondicionado',
-    counterparty: 'Roberto López',
-  },
-  {
-    id: 'txn_004',
-    quoteId: 'q_004',
-    amount: 200000,
-    currency: 'ARS',
-    platformFee: 16000,
-    status: 'held',
-    paymentMethod: 'debit_card',
-    paymentRef: 'VISA-****1234',
-    createdAt: '2025-01-19T08:15:00Z',
-    updatedAt: '2025-01-19T08:15:00Z',
-    quoteTitle: 'Mudanza completa + embalaje',
-    counterparty: 'Laura Fernández',
-  },
-  {
-    id: 'txn_005',
-    quoteId: 'q_005',
-    amount: 67000,
-    currency: 'ARS',
-    platformFee: 5360,
-    status: 'released',
-    paymentMethod: 'wallet',
-    paymentRef: 'WLT-2025-003',
-    releasedAt: '2025-01-22T17:30:00Z',
-    createdAt: '2025-01-21T11:00:00Z',
-    updatedAt: '2025-01-22T17:30:00Z',
-    quoteTitle: 'Reparación de puerta y cerradura',
-    counterparty: 'Jorge Ramírez',
-  },
-  {
-    id: 'txn_006',
-    quoteId: 'q_006',
-    amount: 35000,
-    currency: 'ARS',
-    platformFee: 2800,
-    status: 'disputed',
-    paymentMethod: 'transfer',
-    paymentRef: 'TRF-2025-004',
-    createdAt: '2025-01-22T13:45:00Z',
-    updatedAt: '2025-01-23T09:00:00Z',
-    quoteTitle: 'Limpieza profunda de hogar',
-    counterparty: 'Ana Martínez',
-  },
-];
 
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat('es-AR', {
@@ -130,45 +43,17 @@ function formatDate(dateStr: string) {
 function getStatusConfig(status: string) {
   switch (status) {
     case 'held':
-      return {
-        label: 'Retenido',
-        bg: 'bg-yellow-50',
-        border: 'border-yellow-200',
-        text: 'text-yellow-700',
-        icon: Lock,
-      };
+      return { label: 'Retenido', bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-700', icon: Lock };
     case 'released':
-      return {
-        label: 'Liberado',
-        bg: 'bg-green-50',
-        border: 'border-green-200',
-        text: 'text-green-700',
-        icon: CheckCircle,
-      };
+      return { label: 'Liberado', bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700', icon: CheckCircle };
     case 'refunded':
-      return {
-        label: 'Reembolsado',
-        bg: 'bg-red-50',
-        border: 'border-red-200',
-        text: 'text-red-700',
-        icon: RotateCcw,
-      };
+      return { label: 'Reembolsado', bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', icon: RotateCcw };
     case 'disputed':
-      return {
-        label: 'En disputa',
-        bg: 'bg-blue-50',
-        border: 'border-blue-200',
-        text: 'text-blue-700',
-        icon: AlertTriangle,
-      };
+      return { label: 'En disputa', bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700', icon: AlertTriangle };
+    case 'approved':
+      return { label: 'Aprobado', bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700', icon: CheckCircle };
     default:
-      return {
-        label: status,
-        bg: 'bg-gray-50',
-        border: 'border-gray-200',
-        text: 'text-gray-700',
-        icon: Clock,
-      };
+      return { label: 'Pendiente', bg: 'bg-gray-50', border: 'border-gray-200', text: 'text-gray-700', icon: Clock };
   }
 }
 
@@ -178,21 +63,88 @@ function getPaymentMethodBadge(method: string) {
       return { label: 'Tarjeta de crédito', icon: CreditCard, color: 'text-blue-600 bg-blue-50' };
     case 'debit_card':
       return { label: 'Tarjeta de débito', icon: CreditCard, color: 'text-purple-600 bg-purple-50' };
+    case 'mercadopago':
+      return { label: 'Mercado Pago', icon: Smartphone, color: 'text-blue-600 bg-blue-50' };
     case 'transfer':
-      return { label: 'Transferencia', icon: Banknote, color: 'text-green-600 bg-green-50' };
-    case 'wallet':
-      return { label: 'Billetera virtual', icon: Smartphone, color: 'text-blue-600 bg-blue-50' };
+      return { label: 'Transferencia', icon: Shield, color: 'text-green-600 bg-green-50' };
     default:
-      return { label: method, icon: CreditCard, color: 'text-gray-600 bg-gray-50' };
+      return { label: method || 'N/A', icon: CreditCard, color: 'text-gray-600 bg-gray-50' };
   }
 }
 
 export function PaymentsScreen() {
-  const { goBack } = useAppStore();
+  const { goBack, currentUser } = useAppStore();
   const [activeTab, setActiveTab] = useState<TabFilter>('all');
   const [selectedTxn, setSelectedTxn] = useState<string | null>(null);
+  const [transactions, setTransactions] = useState<(Transaction & { quoteTitle?: string; counterparty?: string })[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [payingQuoteId, setPayingQuoteId] = useState<string | null>(null);
+  const [mpInitPoint, setMpInitPoint] = useState<string | null>(null);
 
-  const filtered = demoTransactions.filter((t) => {
+  const fetchTransactions = useCallback(async () => {
+    if (!currentUser) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/transactions?userId=${currentUser.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        const enriched = (data.data || []).map((t: any) => ({
+          ...t,
+          quoteTitle: t.quote?.title || 'Servicio',
+          counterparty: t.user?.name || '',
+        }));
+        setTransactions(enriched);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    setLoading(false);
+  }, [currentUser]);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [fetchTransactions]);
+
+  const handleCreatePayment = async (quoteId: string, amount: number) => {
+    if (!currentUser) return;
+    setPayingQuoteId(quoteId);
+    setMpInitPoint(null);
+    try {
+      const res = await fetch('/api/payments/create-preference', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quoteId, userId: currentUser.id }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.data?.initPoint) {
+          setMpInitPoint(data.data.initPoint);
+          toast.success('Preferencia de pago creada', {
+            description: 'Serás redirigido a Mercado Pago para completar el pago.',
+          });
+        } else if (data.data?.isDemo) {
+          // Demo mode: simulate payment
+          toast.info('Modo demo - Pago simulado', {
+            description: 'El pago se procesa en modo demostración.',
+          });
+          setTimeout(() => {
+            setPayingQuoteId(null);
+            setMpInitPoint(null);
+            fetchTransactions();
+          }, 2000);
+        }
+      } else {
+        const err = await res.json().catch(() => ({}));
+        toast.error('Error al crear pago', { description: err.error || 'Intentá de nuevo.' });
+      }
+    } catch (err) {
+      toast.error('Error de conexión', { description: 'Verificá tu conexión a internet.' });
+    }
+    setPayingQuoteId(null);
+  };
+
+  const filtered = transactions.filter((t) => {
     if (activeTab === 'all') return true;
     if (activeTab === 'held') return t.status === 'held';
     if (activeTab === 'released') return t.status === 'released';
@@ -200,13 +152,13 @@ export function PaymentsScreen() {
     return true;
   });
 
-  const totalHeld = demoTransactions
+  const totalHeld = transactions
     .filter((t) => t.status === 'held' || t.status === 'disputed')
     .reduce((acc, t) => acc + t.amount, 0);
-  const totalReleased = demoTransactions
+  const totalReleased = transactions
     .filter((t) => t.status === 'released')
     .reduce((acc, t) => acc + t.amount, 0);
-  const totalRefunded = demoTransactions
+  const totalRefunded = transactions
     .filter((t) => t.status === 'refunded')
     .reduce((acc, t) => acc + t.amount, 0);
 
@@ -285,6 +237,38 @@ export function PaymentsScreen() {
           </div>
         </div>
 
+        {/* Mercado Pago Payment Dialog */}
+        {mpInitPoint && (
+          <div className="bg-white rounded-2xl border-2 border-blue-200 p-5 shadow-lg">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center">
+                <span className="text-white font-bold text-xs">MP</span>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-900">Pagar con Mercado Pago</p>
+                <p className="text-[11px] text-gray-500">Serás redirigido a la plataforma de pago</p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <a
+                href={mpInitPoint}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-blue-500 text-white font-semibold text-sm hover:bg-blue-600 transition-all"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Ir a Mercado Pago
+              </a>
+              <button
+                onClick={() => setMpInitPoint(null)}
+                className="px-4 py-3 rounded-xl border border-gray-200 text-gray-600 text-sm hover:bg-gray-50"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Tab Bar */}
         <div className="flex gap-1.5 bg-white rounded-2xl p-1.5 border border-gray-100 shadow-sm">
           {tabs.map((tab) => (
@@ -303,7 +287,15 @@ export function PaymentsScreen() {
         </div>
 
         {/* Transaction List */}
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white rounded-2xl p-4 animate-pulse shadow-sm">
+                <div className="h-24 bg-gray-100 rounded-xl" />
+              </div>
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
               <Eye className="h-8 w-8 text-gray-300" />
@@ -344,20 +336,10 @@ export function PaymentsScreen() {
 
                     {/* Quote title */}
                     <p className="text-sm font-semibold text-gray-800 mb-1 line-clamp-1">
-                      {txn.quoteTitle}
+                      {txn.quoteTitle || 'Servicio'}
                     </p>
 
-                    {/* Counterparty */}
-                    <div className="flex items-center gap-1.5 mb-2">
-                      <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center">
-                        <span className="text-[9px] font-bold text-white">
-                          {txn.counterparty.charAt(0)}
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-500">{txn.counterparty}</p>
-                    </div>
-
-                    {/* Bottom row: date + payment method + fee */}
+                    {/* Payment method badge */}
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-1 text-gray-400">
                         <Clock className="h-3 w-3" />
@@ -408,7 +390,7 @@ export function PaymentsScreen() {
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-xs text-gray-500">Referencia</span>
-                          <span className="text-xs font-mono text-gray-500">{txn.paymentRef}</span>
+                          <span className="text-xs font-mono text-gray-500">{txn.paymentRef || '-'}</span>
                         </div>
                         {txn.releasedAt && (
                           <div className="flex items-center justify-between">
@@ -444,7 +426,7 @@ export function PaymentsScreen() {
         {/* Bottom info */}
         <div className="text-center py-2">
           <p className="text-[10px] text-gray-400">
-            Todas las transacciones están protegidas con nuestro sistema de escrow
+            Pagos procesados de forma segura a través de Mercado Pago
           </p>
         </div>
       </div>

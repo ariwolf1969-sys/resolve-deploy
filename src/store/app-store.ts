@@ -24,7 +24,13 @@ export type AppView =
   | 'payment-detail'
   | 'check-in'
   | 'dispute'
-  | 'trust-center';
+  | 'trust-center'
+  // Feature 2: Notifications
+  | 'notifications'
+  // Feature 3: Identity Verification
+  | 'verify-identity'
+  // Feature 4: Admin Dashboard
+  | 'admin-dashboard';
 
 export type Category = {
   id: string;
@@ -63,6 +69,17 @@ export type User = {
   completedJobs: number;
   balance?: number;
   createdAt?: string;
+};
+
+export type AppNotification = {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  type: string;
+  read: boolean;
+  link?: string;
+  createdAt: string;
 };
 
 export type Need = {
@@ -155,6 +172,9 @@ export type Quote = {
   expiresAt: string;
   createdAt: string;
   updatedAt: string;
+  depositPaid?: boolean;
+  depositAmount?: number;
+  validUntil?: string;
   provider: { id: string; name: string; avatar?: string; profession?: string; ratingAvg: number; ratingCount: number; dniVerified: boolean };
   client: { id: string; name: string; avatar?: string; ratingAvg: number; ratingCount: number };
   transactions?: Transaction[];
@@ -209,6 +229,32 @@ export type Dispute = {
   against: { id: string; name: string; avatar?: string };
 };
 
+// Admin types
+export type AdminStats = {
+  totalUsers: number;
+  totalProfessionals: number;
+  activeQuotes: number;
+  completedJobs: number;
+  totalRevenue: number;
+  openDisputes: number;
+  pendingVerifications: number;
+};
+
+export type AdminUser = {
+  id: string;
+  name: string;
+  phone: string;
+  email?: string;
+  role: string;
+  profession?: string;
+  verified: boolean;
+  dniVerified: boolean;
+  ratingAvg: number;
+  completedJobs: number;
+  balance: number;
+  createdAt: string;
+};
+
 interface AppState {
   // Navigation
   currentView: AppView;
@@ -261,6 +307,10 @@ interface AppState {
   // Selected quote
   selectedQuote: Quote | null;
   setSelectedQuote: (quote: Quote | null) => void;
+
+  // Notifications
+  unreadCount: number;
+  setUnreadCount: (count: number) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -318,4 +368,8 @@ export const useAppStore = create<AppState>((set) => ({
   // Selected quote
   selectedQuote: null,
   setSelectedQuote: (quote) => set({ selectedQuote: quote }),
+
+  // Notifications
+  unreadCount: 0,
+  setUnreadCount: (count) => set({ unreadCount: count }),
 }));

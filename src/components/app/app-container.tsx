@@ -20,17 +20,11 @@ import { QuoteDetailScreen } from '@/components/app/quote-detail-screen';
 import { PaymentsScreen } from '@/components/app/payments-screen';
 import { CheckInScreen } from '@/components/app/check-in-screen';
 import { DisputeScreen } from '@/components/app/dispute-screen';
+import { NotificationScreen } from '@/components/app/notification-screen';
+import { VerifyIdentityScreen } from '@/components/app/verify-identity-screen';
+import { AdminDashboardScreen } from '@/components/app/admin-dashboard-screen';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ARGENTINA_PROVINCES, getCitiesByProvince, isCaba } from '@/lib/argentina-locations';
-
-// Helper: format ARS price
-function formatPrice(price: number): string {
-  return new Intl.NumberFormat('es-AR', {
-    style: 'currency',
-    currency: 'ARS',
-    maximumFractionDigits: 0,
-  }).format(price);
-}
 
 // Helper: compress image before upload
 async function compressImage(file: File, maxWidth: number, maxHeight: number, quality: number): Promise<Blob> {
@@ -112,6 +106,9 @@ export default function AppContainer() {
             {currentView === 'payments' && <PaymentsScreen />}
             {currentView === 'check-in' && <CheckInScreen />}
             {currentView === 'dispute' && <DisputeScreen />}
+            {currentView === 'notifications' && <NotificationScreen />}
+            {currentView === 'verify-identity' && <VerifyIdentityScreen />}
+            {currentView === 'admin-dashboard' && <AdminDashboardScreen />}
           </motion.div>
         </AnimatePresence>
       </div>

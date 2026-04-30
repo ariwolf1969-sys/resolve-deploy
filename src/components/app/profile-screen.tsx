@@ -6,7 +6,7 @@ import { getProvinceName, isCaba } from '@/lib/argentina-locations';
 import { formatBudget, getCategoryName, getCategoryColor, timeAgo } from './home-screen';
 
 export function ProfileScreen() {
-  const { currentUser, setView, setSelectedUserProfile, setSelectedNeed } = useAppStore();
+  const { currentUser, setView, setSelectedUserProfile, setSelectedNeed, unreadCount } = useAppStore();
   const [needs, setNeeds] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -227,6 +227,29 @@ export function ProfileScreen() {
         </div>
       )}
 
+      {/* Verify Identity (for non-verified users) */}
+      {!currentUser.dniVerified && (
+        <div className="px-5 mt-4">
+          <button
+            onClick={() => setView('verify-identity')}
+            className="w-full flex items-center gap-3 p-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl text-white hover:shadow-lg transition-all active:scale-[0.99]"
+          >
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-semibold">Verificar identidad</p>
+              <p className="text-[10px] text-blue-200">Verificá tu DNI para generar más confianza en tus clientes</p>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+          </button>
+        </div>
+      )}
+
       {/* My Needs */}
       <div className="px-5 mt-4 pb-4">
         <h3 className="text-sm font-semibold mb-3">Mis publicaciones</h3>
@@ -320,7 +343,7 @@ export function ProfileScreen() {
               <path d="m9 18 6-6-6-6" />
             </svg>
           </button>
-          <button className="w-full flex items-center gap-3 p-3 rounded-xl bg-white border border-gray-100 hover:shadow-sm transition-all text-left">
+          <button onClick={() => setView('verify-identity')} className="w-full flex items-center gap-3 p-3 rounded-xl bg-white border border-gray-100 hover:shadow-sm transition-all text-left">
             <div className="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
@@ -328,12 +351,30 @@ export function ProfileScreen() {
             </div>
             <div>
               <p className="text-sm font-medium">Seguridad</p>
-              <p className="text-[10px] text-muted-foreground">Verificación y configuración</p>
+              <p className="text-[10px] text-muted-foreground">
+                {currentUser.dniVerified ? 'Identidad verificada ✅' : 'Verificación y configuración'}
+              </p>
+            </div>
+          </button>
+          <button onClick={() => setView('notifications')} className="w-full flex items-center gap-3 p-3 rounded-xl bg-white border border-gray-100 hover:shadow-sm transition-all text-left">
+            <div className="w-9 h-9 rounded-lg bg-purple-100 flex items-center justify-center relative">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+              </svg>
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                  <span className="text-[7px] font-bold text-white">{unreadCount > 9 ? '9+' : unreadCount}</span>
+                </span>
+              )}
+            </div>
+            <div>
+              <p className="text-sm font-medium">Notificaciones</p>
+              <p className="text-[10px] text-muted-foreground">{unreadCount > 0 ? `${unreadCount} sin leer` : 'Sin notificaciones nuevas'}</p>
             </div>
           </button>
           <button className="w-full flex items-center gap-3 p-3 rounded-xl bg-white border border-gray-100 hover:shadow-sm transition-all text-left">
-            <div className="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <div className="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><path d="M12 17h.01" />
               </svg>
             </div>
@@ -342,6 +383,20 @@ export function ProfileScreen() {
               <p className="text-[10px] text-muted-foreground">Preguntas frecuentes y soporte</p>
             </div>
           </button>
+          {/* Admin button (only visible to admin users) */}
+          {(currentUser.phone?.includes('admin') || currentUser.email?.includes('admin')) && (
+            <button onClick={() => setView('admin-dashboard')} className="w-full flex items-center gap-3 p-3 rounded-xl bg-gray-900 border border-gray-800 hover:shadow-sm transition-all text-left">
+              <div className="w-9 h-9 rounded-lg bg-gray-800 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-200">Admin</p>
+                <p className="text-[10px] text-gray-500">Panel de administración</p>
+              </div>
+            </button>
+          )}
         </div>
       </div>
     </div>

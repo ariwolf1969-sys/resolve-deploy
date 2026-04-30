@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAppStore, type Need, type Category, type User } from '@/store/app-store';
 import { getProvinceName, isCaba } from '@/lib/argentina-locations';
+import { toast } from 'sonner';
 
 // Legacy categories for needs (still supported)
 const CATEGORIES: Category[] = [
@@ -127,114 +128,12 @@ function renderStars(rating: number) {
   return stars;
 }
 
-const DEMO_ADS = [
-  {
-    id: 1,
-    business: 'Ferretería El Rápido',
-    tagline: 'Todo en ferretería y construcción. Envíos a todo el país.',
-    gradient: 'from-blue-500 to-blue-700',
-    icon: '🔧',
-  },
-  {
-    id: 2,
-    business: 'Casa de Sanitarios',
-    tagline: 'Baños y cocinas de diseño. 20% off en mostrador.',
-    gradient: 'from-purple-500 to-purple-700',
-    icon: '🚿',
-  },
-  {
-    id: 3,
-    business: 'Pinturerías del Centro',
-    tagline: 'Pinturas, revestimientos y herramientas. Presupuestos sin cargo.',
-    gradient: 'from-green-500 to-green-700',
-    icon: '🎨',
-  },
-  {
-    id: 4,
-    business: 'Depósito Don Juan',
-    tagline: 'Materiales eléctricos y plomería. Mayorista y minorista.',
-    gradient: 'from-red-500 to-red-700',
-    icon: '⚡',
-  },
-];
-
-function AdCarousel() {
-  const [current, setCurrent] = useState(0);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  const startTimer = useCallback(() => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % DEMO_ADS.length);
-    }, 4000);
-  }, []);
-
-  useEffect(() => {
-    startTimer();
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [startTimer]);
-
-  const goTo = (index: number) => {
-    setCurrent(index);
-    startTimer();
-  };
-
-  return (
-    <div className="mb-5">
-      <div className="relative overflow-hidden rounded-2xl">
-        <div
-          className="flex transition-transform duration-500 ease-in-out"
-          style={{ transform: `translateX(-${current * 100}%)` }}
-        >
-          {DEMO_ADS.map((ad) => (
-            <div key={ad.id} className="w-full shrink-0">
-              <div className={`bg-gradient-to-br ${ad.gradient} rounded-2xl p-5 relative overflow-hidden`}>
-                {/* Decorative circles */}
-                <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/10 rounded-full" />
-                <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/10 rounded-full" />
-                {/* Publicidad label */}
-                <span className="absolute top-2 right-2 text-[8px] bg-white/20 text-white/80 px-2 py-0.5 rounded-full font-medium">
-                  Publicidad
-                </span>
-                <div className="relative z-10">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-2xl">{ad.icon}</span>
-                    <h3 className="text-base font-bold text-white">{ad.business}</h3>
-                  </div>
-                  <p className="text-xs text-white/80 mb-3 leading-relaxed">{ad.tagline}</p>
-                  <button className="bg-white/20 hover:bg-white/30 text-white text-xs font-semibold px-4 py-1.5 rounded-lg transition-colors">
-                    Ver más
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        {/* Dots indicator */}
-        <div className="flex justify-center gap-1.5 mt-3">
-          {DEMO_ADS.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => goTo(i)}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${i === current ? 'bg-blue-500 w-5' : 'bg-gray-300'}`}
-              aria-label={`Ir al anuncio ${i + 1}`}
-            />
-          ))}
-        </div>
-      </div>
-      <button className="block mx-auto mt-2 text-[10px] text-muted-foreground hover:text-blue-500 transition-colors font-medium">
-        Publicá tu negocio →
-      </button>
-    </div>
-  );
-}
-
 export { formatBudget, renderStars, PROFESSIONS, getCategoryName, getCategoryColor, getCategoryIcon, timeAgo };
 
 export function HomeScreen() {
   const {
     setView, setSelectedUserProfile,
-    currentUser, setIsLoading,
+    currentUser, setIsLoading, unreadCount, setUnreadCount,
   } = useAppStore();
 
   const [topProfessionals, setTopProfessionals] = useState<User[]>([]);
@@ -254,9 +153,31 @@ export function HomeScreen() {
     setIsLoadingPro(false);
   }, []);
 
+  // Fetch unread notification count
+  const fetchUnreadCount = useCallback(async () => {
+    if (!currentUser) return;
+    try {
+      const res = await fetch(`/api/notifications?unreadOnly=true&limit=1`, {
+        headers: { 'x-user-id': currentUser.id },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUnreadCount(data.meta?.unreadCount || 0);
+      }
+    } catch (err) {
+      // silent fail
+    }
+  }, [currentUser, setUnreadCount]);
+
   useEffect(() => {
     fetchTopProfessionals();
   }, [fetchTopProfessionals]);
+
+  useEffect(() => {
+    fetchUnreadCount();
+    const interval = setInterval(fetchUnreadCount, 30000); // poll every 30s
+    return () => clearInterval(interval);
+  }, [fetchUnreadCount]);
 
   const handleSeed = async () => {
     setIsLoading(true);
@@ -298,9 +219,28 @@ export function HomeScreen() {
               <p className="text-blue-100 text-xs mt-0.5">Encontrá profesionales en toda Argentina</p>
             )}
           </div>
-          <button onClick={handleSeed} className="text-xs bg-white/20 text-white px-3 py-1.5 rounded-lg hover:bg-white/30 transition-colors">
-            {topProfessionals.length === 0 ? 'Cargar demo' : 'Actualizar'}
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Notification Bell */}
+            <button
+              onClick={() => setView('notifications')}
+              className="relative p-2 rounded-lg hover:bg-white/20 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+              </svg>
+              {unreadCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 bg-red-500 rounded-full flex items-center justify-center border-2 border-blue-500">
+                  <span className="text-[8px] font-bold text-white">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                </span>
+              )}
+            </button>
+            <button onClick={handleSeed} className="text-xs bg-white/20 text-white px-3 py-1.5 rounded-lg hover:bg-white/30 transition-colors">
+              {topProfessionals.length === 0 ? 'Cargar demo' : 'Actualizar'}
+            </button>
+          </div>
         </div>
 
         {/* Search Bar */}
@@ -366,9 +306,6 @@ export function HomeScreen() {
             </div>
           </div>
         </div>
-
-        {/* Ad Carousel */}
-        <AdCarousel />
 
         {/* Top Rated Professionals */}
         <div className="mb-5">
