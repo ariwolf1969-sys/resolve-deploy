@@ -1,14 +1,12 @@
 'use client';
 
 import { useAppStore } from '@/store/app-store';
-import type { AffiliateProduct } from '@/store/app-store';
 import {
   Shield,
   MapPin,
   Camera,
   Scale,
   ArrowRight,
-  Store,
   ChevronRight,
   CheckCircle,
   Lock,
@@ -16,241 +14,14 @@ import {
   Zap,
   Search,
   FileText,
-  Menu,
-  X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import { PROFESSIONS } from '@/components/app/home-screen';
-import { useState, useEffect, useRef, useCallback } from 'react';
-
-const SOURCE_BADGES = [
-  { name: 'Amazon', color: 'bg-amber-100 text-amber-800 border-amber-200' },
-  { name: 'eBay', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-  { name: 'MercadoLibre', color: 'bg-yellow-100 text-yellow-800 border-yellow-200' },
-  { name: 'AliExpress', color: 'bg-red-50 text-red-700 border-red-200' },
-  { name: 'Temu', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-  { name: 'SHEIN', color: 'bg-pink-50 text-pink-700 border-pink-200' },
-];
-
-function upgradeImageUrl(url: string): string {
-  if (!url) return url;
-  if (!url.includes('mlstatic.com')) return url;
-  // ML 2X retina thumbnails: D_NQ_NP_2X_XXXXX-O.jpg → remove 2X_ and use -W
-  let upgraded = url.replace(/_2X_/, '_').replace(/-O\.(jpg|jpeg|png|webp)$/i, '-W.jpg');
-  // ML standard thumbnails: D_XXXXX-O.jpg → -W.jpg (1200x1200)
-  if (upgraded === url) {
-    upgraded = url.replace(/-O\.(jpg|jpeg|png|webp)$/i, '-W.jpg');
-  }
-  // ML -I.jpg (original) → -W.jpg for consistency
-  if (upgraded === url) {
-    upgraded = url.replace(/-I\.(jpg|jpeg|png|webp)$/i, '-W.jpg');
-  }
-  return upgraded;
-}
-
-function formatPrice(price: number) {
-  return new Intl.NumberFormat('es-AR', {
-    style: 'currency',
-    currency: 'ARS',
-    maximumFractionDigits: 0,
-  }).format(price);
-}
-
-function getSourceBadgeColor(source: string) {
-  return SOURCE_BADGES.find((b) => b.name === source)?.color ?? 'bg-gray-100 text-gray-700 border-gray-200';
-}
-
-function getSourceLabel(source: string): string {
-  const map: Record<string, string> = {
-    mercadolibre: 'MercadoLibre',
-    amazon: 'Amazon',
-    aliexpress: 'AliExpress',
-    temu: 'Temu',
-    shein: 'SHEIN',
-    ebay: 'eBay',
-  };
-  return map[source] || source;
-}
-
-function ProductCard({ product, setView, setSelectedProduct }: {
-  product: AffiliateProduct;
-  setView: (v: any) => void;
-  setSelectedProduct: (p: AffiliateProduct) => void;
-}) {
-  const discount = product.originalPrice
-    ? Math.round((1 - product.price / product.originalPrice) * 100)
-    : 0;
-
-  return (
-    <div className="shrink-0 w-[180px] sm:w-[195px] lg:w-[210px] group">
-      <Card className="overflow-hidden rounded-xl border border-gray-200/80 p-0 transition-all hover:shadow-lg">
-        <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
-          {product.imageUrl ? (
-            <img
-              src={upgradeImageUrl(product.imageUrl)}
-              alt={product.title}
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-              loading="lazy"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gray-50">
-              <Store className="h-8 w-8 text-gray-300" />
-            </div>
-          )}
-          <Badge
-            variant="outline"
-            className={`absolute left-2 top-2 text-[9px] font-medium ${getSourceBadgeColor(getSourceLabel(product.source))} border`}
-          >
-            {getSourceLabel(product.source)}
-          </Badge>
-          {discount > 0 && (
-            <Badge className="absolute right-2 top-2 bg-red-500 text-white text-[9px]">
-              -{discount}%
-            </Badge>
-          )}
-        </div>
-        <CardContent className="p-3">
-          <h3 className="text-xs font-semibold leading-snug text-gray-900 line-clamp-2 min-h-[2rem]">
-            {product.title}
-          </h3>
-          {product.rating && (
-            <div className="mt-1 flex items-center gap-1">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 fill-amber-400 text-amber-400" viewBox="0 0 24 24" fill="currentColor">
-                <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clipRule="evenodd" />
-              </svg>
-              <span className="text-[10px] font-medium text-gray-700">{product.rating.toFixed(1)}</span>
-              {product.reviewCount > 0 && (
-                <span className="text-[10px] text-gray-400">({product.reviewCount})</span>
-              )}
-            </div>
-          )}
-          <div className="mt-1.5 flex items-baseline gap-1.5">
-            <span className="text-sm font-bold text-blue-600">{formatPrice(product.price)}</span>
-            {product.originalPrice && product.originalPrice > product.price && (
-              <span className="text-[10px] text-gray-400 line-through">{formatPrice(product.originalPrice)}</span>
-            )}
-          </div>
-          <Button
-            className="mt-2 h-7 w-full bg-blue-500 text-[10px] font-semibold text-white hover:bg-blue-600 px-0"
-            onClick={(e) => {
-              e.stopPropagation();
-              setSelectedProduct(product);
-              setView('product-detail');
-            }}
-          >
-            Ver oferta
-          </Button>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
+import { useState } from 'react';
 
 export function WebLandingScreen() {
-  const { setView, setSelectedProduct } = useAppStore();
+  const { setView } = useAppStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [products, setProducts] = useState<AffiliateProduct[]>([]);
-  const [productsLoaded, setProductsLoaded] = useState(false);
-
-  useEffect(() => {
-    async function loadProducts() {
-      try {
-        // Try to fetch real products from the database
-        const res = await fetch('/api/products?pageSize=20&featured=true');
-        if (res.ok) {
-          const data = await res.json();
-          if (data.data && data.data.length > 0) {
-            setProducts(data.data);
-            setProductsLoaded(true);
-            return;
-          }
-        }
-        // If no featured products, try any active products
-        const res2 = await fetch('/api/products?pageSize=20');
-        if (res2.ok) {
-          const data2 = await res2.json();
-          if (data2.data && data2.data.length > 0) {
-            setProducts(data2.data);
-            setProductsLoaded(true);
-            return;
-          }
-        }
-
-        // DB is empty: trigger sync in background AND fetch directly from ML API
-        fetch('/api/products/sync', { method: 'GET' }).catch(() => {});
-
-        try {
-          // Fetch from multiple categories for variety
-          const mlCategories = [
-            'celulares smartphones',
-            'auriculares bluetooth inalambricos',
-            'zapatillas deportivas running',
-            'herramientas eléctricas taladro',
-          ];
-          const mlFetches = mlCategories.map(query =>
-            fetch(`https://api.mercadolibre.com/sites/MLA/search?q=${encodeURIComponent(query)}&condition=new&shipping=free&limit=8`)
-              .then(res => res.ok ? res.json() : null)
-              .catch(() => null)
-          );
-          const mlResults = await Promise.all(mlFetches);
-          const allMlProducts: AffiliateProduct[] = [];
-
-          for (const mlData of mlResults) {
-            if (mlData?.results?.length) {
-              for (const item of mlData.results.slice(0, 8)) {
-                // Use highest quality picture if available
-                const rawImage = item.pictures?.[0]?.secure_url || item.thumbnail || '';
-                allMlProducts.push({
-                  id: String(item.id),
-                  title: item.title || 'Sin título',
-                  price: item.price || 0,
-                  originalPrice: item.original_price || undefined,
-                  currency: item.currency_id || 'ARS',
-                  imageUrl: rawImage,
-                  sourceUrl: item.permalink || '',
-                  source: 'mercadolibre',
-                  category: item.category_id || '',
-                  brand: item.attributes?.find((a: any) => a.id === 'BRAND')?.value_name || undefined,
-                  rating: item.review?.rating_average || undefined,
-                  reviewCount: item.review?.total || 0,
-                  commission: 5,
-                  active: true,
-                  featured: false,
-                  description: '',
-                  createdAt: new Date().toISOString(),
-                  updatedAt: new Date().toISOString(),
-                });
-              }
-            }
-          }
-
-          if (allMlProducts.length > 0) {
-            setProducts(allMlProducts);
-            setProductsLoaded(true);
-            return;
-          }
-        } catch (mlErr) {
-          console.error('Error fetching from ML API:', mlErr);
-        }
-
-        setProductsLoaded(false);
-      } catch (err) {
-        console.error('Error loading products:', err);
-        setProductsLoaded(false);
-      }
-    }
-    loadProducts();
-  }, []);
-
-  // Row 1: first half, Row 2: second half (reversed for visual variety)
-  const mid = Math.ceil(products.length / 2);
-  const row1Products = products.slice(0, mid);
-  const row2Products = products.slice(mid).reverse();
-
-  // If no products yet, use placeholder message
-  const showProducts = products.length > 0;
 
   return (
     <div className="min-h-screen bg-white">
@@ -326,10 +97,10 @@ export function WebLandingScreen() {
                 size="lg"
                 variant="outline"
                 className="h-12 w-full border-2 border-white/40 bg-transparent px-8 text-base font-semibold text-white hover:bg-white/10 sm:w-auto"
-                onClick={() => setView('products')}
+                onClick={() => setView('home')}
               >
-                <Store className="mr-2 h-5 w-5" />
-                Ver Productos
+                <Search className="mr-2 h-5 w-5" />
+                Buscar profesionales
               </Button>
             </div>
           </div>
@@ -467,64 +238,7 @@ export function WebLandingScreen() {
         </div>
       </section>
 
-      {/* ──────────────── 5. PRODUCTS CAROUSEL ──────────────── */}
-      <section className="bg-gray-50 py-14 sm:py-16 lg:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl lg:text-4xl">Productos recomendados</h2>
-            <p className="mt-3 text-base text-gray-500 sm:text-lg">Los mejores productos de las principales tiendas online</p>
-          </div>
-
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
-            {SOURCE_BADGES.map((badge) => (
-              <Badge key={badge.name} variant="outline" className={`text-xs ${badge.color} border`}>
-                {badge.name}
-              </Badge>
-            ))}
-          </div>
-
-          {showProducts ? (
-            <>
-              {/* Row 1 */}
-              <div className="mt-8 overflow-hidden">
-                <div className="flex gap-4 animate-scroll">
-                  {[...row1Products, ...row1Products].map((product, i) => (
-                    <ProductCard key={`${product.id}-${i}`} product={product} setView={setView} setSelectedProduct={setSelectedProduct} />
-                  ))}
-                </div>
-              </div>
-
-              {/* Row 2 */}
-              <div className="mt-4 overflow-hidden">
-                <div className="flex gap-4 animate-scroll-reverse">
-                  {[...row2Products, ...row2Products].map((product, i) => (
-                    <ProductCard key={`${product.id}-r-${i}`} product={product} setView={setView} setSelectedProduct={setSelectedProduct} />
-                  ))}
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="mt-8 text-center py-12 bg-white rounded-2xl border border-gray-100">
-              <Store className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 text-sm">Cargando productos de MercadoLibre...</p>
-              <p className="text-gray-400 text-xs mt-1">Los productos aparecerán automáticamente</p>
-            </div>
-          )}
-
-          <div className="mt-10 text-center">
-            <Button
-              variant="ghost"
-              className="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-              onClick={() => setView('products')}
-            >
-              Ver todos los productos
-              <ChevronRight className="ml-1 h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* ──────────────── 6. DOWNLOAD APP ──────────────── */}
+      {/* ──────────────── 5. DOWNLOAD APP ──────────────── */}
       <section className="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 py-14 sm:py-16 lg:py-20">
         <div className="absolute top-0 right-0 h-96 w-96 rounded-full bg-blue-500/5 blur-3xl" />
         <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-cyan-500/5 blur-3xl" />
@@ -572,11 +286,11 @@ export function WebLandingScreen() {
                         <Zap className="h-9 w-9 text-white" />
                       </div>
                       <h3 className="mt-4 text-xl font-bold text-white">Resolvé</h3>
-                      <p className="mt-2 text-xs text-blue-100">Servicios &amp; Productos</p>
+                      <p className="mt-2 text-xs text-blue-100">Servicios profesionales</p>
                       <div className="mt-8 w-full space-y-2.5">
                         {[
                           { icon: <Search className="h-4 w-4" />, label: 'Buscar servicio' },
-                          { icon: <Store className="h-4 w-4" />, label: 'Ver productos' },
+                          { icon: <FileText className="h-4 w-4" />, label: 'Pedir presupuesto' },
                           { icon: <Shield className="h-4 w-4" />, label: 'Pagos seguros' },
                         ].map((item) => (
                           <div key={item.label} className="flex items-center gap-3 rounded-xl bg-white/15 px-4 py-2.5 backdrop-blur-sm">
@@ -595,7 +309,7 @@ export function WebLandingScreen() {
         </div>
       </section>
 
-      {/* ──────────────── 7. FOOTER ──────────────── */}
+      {/* ──────────────── 6. FOOTER ──────────────── */}
       <footer className="bg-gray-900 pt-12 pb-8 sm:pt-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -604,12 +318,12 @@ export function WebLandingScreen() {
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500"><Zap className="h-4 w-4 text-white" /></div>
                 <span className="text-lg font-bold text-white">Resolvé</span>
               </div>
-              <p className="mt-3 text-sm leading-relaxed text-gray-400">Conectamos lo que necesitás con quien puede hacerlo. Servicios y productos de confianza en toda la Argentina.</p>
+              <p className="mt-3 text-sm leading-relaxed text-gray-400">Conectamos lo que necesitás con quien puede hacerlo. Servicios profesionales de confianza en toda la Argentina.</p>
             </div>
             <div>
               <h4 className="text-sm font-semibold text-white">Plataforma</h4>
               <ul className="mt-3 space-y-2.5">
-                {['Cómo funciona', 'Profesionales', 'Productos', 'Seguridad'].map((link) => (
+                {['Cómo funciona', 'Profesionales', 'Servicios', 'Seguridad'].map((link) => (
                   <li key={link}><button className="text-sm text-gray-400 transition-colors hover:text-blue-400">{link}</button></li>
                 ))}
               </ul>

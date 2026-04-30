@@ -16,8 +16,6 @@ export type AppView =
   | 'register-pro'
   // New views
   | 'web-landing'
-  | 'products'
-  | 'product-detail'
   | 'quotes'
   | 'create-quote'
   | 'quote-detail'
@@ -134,29 +132,6 @@ export type Message = {
   read: boolean;
   createdAt: string;
   sender: { id: string; name: string; avatar?: string };
-};
-
-// ====== NEW TYPES ======
-
-export type AffiliateProduct = {
-  id: string;
-  title: string;
-  description?: string;
-  price: number;
-  originalPrice?: number;
-  currency: string;
-  imageUrl?: string;
-  sourceUrl: string;
-  source: string;
-  category: string;
-  brand?: string;
-  rating?: number;
-  reviewCount: number;
-  commission: number;
-  active: boolean;
-  featured: boolean;
-  createdAt: string;
-  updatedAt: string;
 };
 
 export type Quote = {
@@ -283,20 +258,6 @@ interface AppState {
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
 
-  // ====== NEW STATE ======
-
-  // Product filters
-  selectedProductSource: string;
-  setSelectedProductSource: (source: string) => void;
-  selectedProductCategory: string;
-  setSelectedProductCategory: (category: string) => void;
-  productSearchQuery: string;
-  setProductSearchQuery: (query: string) => void;
-
-  // Selected product
-  selectedProduct: AffiliateProduct | null;
-  setSelectedProduct: (product: AffiliateProduct | null) => void;
-
   // Selected quote
   selectedQuote: Quote | null;
   setSelectedQuote: (quote: Quote | null) => void;
@@ -353,20 +314,6 @@ export const useAppStore = create<AppState>((set) => ({
   // UI state
   isLoading: false,
   setIsLoading: (loading) => set({ isLoading: loading }),
-
-  // ====== NEW STATE ======
-
-  // Product filters
-  selectedProductSource: 'all',
-  setSelectedProductSource: (source) => set({ selectedProductSource: source }),
-  selectedProductCategory: 'all',
-  setSelectedProductCategory: (category) => set({ selectedProductCategory: category }),
-  productSearchQuery: '',
-  setProductSearchQuery: (query) => set({ productSearchQuery: query }),
-
-  // Selected product
-  selectedProduct: null,
-  setSelectedProduct: (product) => set({ selectedProduct: product }),
 
   // Selected quote
   selectedQuote: null,

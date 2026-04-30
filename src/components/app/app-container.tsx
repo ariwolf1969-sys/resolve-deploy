@@ -14,7 +14,6 @@ import { BottomNav } from '@/components/app/bottom-nav';
 import { SearchOverlay } from '@/components/app/search-overlay';
 import { UserRatingDialog } from '@/components/app/user-rating-dialog';
 import { WebLandingScreen } from '@/components/app/web-landing-screen';
-import { ProductsScreen } from '@/components/app/products-screen';
 import { QuotesScreen } from '@/components/app/quotes-screen';
 import { CreateQuoteScreen } from '@/components/app/create-quote-screen';
 import { QuoteDetailScreen } from '@/components/app/quote-detail-screen';
@@ -22,7 +21,6 @@ import { PaymentsScreen } from '@/components/app/payments-screen';
 import { CheckInScreen } from '@/components/app/check-in-screen';
 import { DisputeScreen } from '@/components/app/dispute-screen';
 import { AnimatePresence, motion } from 'framer-motion';
-import { buildAffiliateUrl } from '@/lib/affiliate';
 import { ARGENTINA_PROVINCES, getCitiesByProvince, isCaba } from '@/lib/argentina-locations';
 
 // Helper: format ARS price
@@ -65,23 +63,6 @@ async function compressImage(file: File, maxWidth: number, maxHeight: number, qu
   });
 }
 
-// Helper: upgrade ML image URL to higher quality
-function upgradeImageUrl(url: string): string {
-  if (!url) return url;
-  if (!url.includes('mlstatic.com')) return url;
-  // ML 2X retina thumbnails: D_NQ_NP_2X_XXXXX-O.jpg → remove 2X_ and use -W
-  let upgraded = url.replace(/_2X_/, '_').replace(/-O\.(jpg|jpeg|png|webp)$/i, '-W.jpg');
-  // ML standard thumbnails: D_XXXXX-O.jpg → -W.jpg (1200x1200)
-  if (upgraded === url) {
-    upgraded = url.replace(/-O\.(jpg|jpeg|png|webp)$/i, '-W.jpg');
-  }
-  // ML -I.jpg (original) → -W.jpg for consistency
-  if (upgraded === url) {
-    upgraded = url.replace(/-I\.(jpg|jpeg|png|webp)$/i, '-W.jpg');
-  }
-  return upgraded;
-}
-
 const pageVariants = {
   initial: { opacity: 0, x: 20 },
   animate: { opacity: 1, x: 0 },
@@ -92,7 +73,7 @@ const pageVariants = {
 const fullWidthViews = ['web-landing'];
 
 // Views that show the bottom navigation
-const navViews = ['home', 'chat-list', 'profile', 'search', 'products', 'quotes', 'payments'];
+const navViews = ['home', 'chat-list', 'profile', 'search', 'quotes', 'payments'];
 
 export default function AppContainer() {
   const { currentView } = useAppStore();
@@ -125,8 +106,6 @@ export default function AppContainer() {
             {currentView === 'search' && <SearchOverlay />}
             {currentView === 'pro-profile' && <ProfessionalProfileScreen />}
             {currentView === 'register-pro' && <RegisterProfessionalScreen />}
-            {currentView === 'products' && <ProductsScreen />}
-            {currentView === 'product-detail' && <ProductDetailScreen />}
             {currentView === 'quotes' && <QuotesScreen />}
             {currentView === 'create-quote' && <CreateQuoteScreen />}
             {currentView === 'quote-detail' && <QuoteDetailScreen />}
@@ -401,177 +380,4 @@ function EditProfileScreen() {
   );
 }
 
-function ProductDetailScreen() {
-  const { goBack, selectedProduct } = useAppStore();
-  if (!selectedProduct) {
-    return (
-      <div className="min-h-full p-4 flex flex-col items-center justify-center">
-        <p className="text-muted-foreground">Producto no encontrado</p>
-        <button onClick={() => goBack()} className="mt-4 text-blue-500 font-medium">Volver</button>
-      </div>
-    );
-  }
 
-  const discount = selectedProduct.originalPrice
-    ? Math.round((1 - selectedProduct.price / selectedProduct.originalPrice) * 100)
-    : 0;
-
-  const sourceColors: Record<string, string> = {
-    amazon: 'bg-blue-100 text-blue-700 border-blue-200',
-    ebay: 'bg-blue-100 text-blue-700 border-blue-200',
-    mercadolibre: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-    aliexpress: 'bg-red-100 text-red-700 border-red-200',
-    temu: 'bg-purple-100 text-purple-700 border-purple-200',
-    shein: 'bg-pink-100 text-pink-700 border-pink-200',
-  };
-
-  const sourceLabels: Record<string, string> = {
-    amazon: 'Amazon',
-    ebay: 'eBay',
-    mercadolibre: 'MercadoLibre',
-    aliexpress: 'AliExpress',
-    temu: 'Temu',
-    shein: 'SHEIN',
-  };
-
-  // Derive display image URL with upgrade + fallback
-  const displayImageUrl = (() => {
-    const upgraded = selectedProduct.imageUrl ? upgradeImageUrl(selectedProduct.imageUrl) : '';
-    if (upgraded) return upgraded;
-    // Try to extract image from sourceUrl (ML product pages)
-    if (selectedProduct.sourceUrl && selectedProduct.sourceUrl.includes('mercadolibre')) {
-      // Try to extract ML ID and construct high-quality image URL
-      const mlMatch = selectedProduct.sourceUrl.match(/MLA(\d+)/);
-      if (mlMatch) {
-        return `https://http2.mlstatic.com/D_${mlMatch[0]}-W.jpg`;
-      }
-    }
-    // For other sources, try using the sourceUrl as-is if it's an image URL
-    if (selectedProduct.imageUrl && selectedProduct.imageUrl.startsWith('http')) {
-      return selectedProduct.imageUrl;
-    }
-    return '';
-  })();
-
-  return (
-    <div className="min-h-full bg-white">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b px-4 py-3 flex items-center gap-3">
-        <button onClick={() => goBack()} className="p-2 -ml-2 rounded-lg hover:bg-gray-100">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-            <path d="m15 18-6-6 6-6" />
-          </svg>
-        </button>
-        <h1 className="text-lg font-semibold truncate flex-1">Detalle del producto</h1>
-      </div>
-
-      {/* Product Image */}
-      <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative">
-        {displayImageUrl ? (
-          <img
-            src={displayImageUrl}
-            alt={selectedProduct.title}
-            className="h-full w-full object-contain"
-          />
-        ) : (
-          <div className="flex flex-col items-center gap-3 p-6">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-              <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7" />
-              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-              <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4" />
-              <path d="M2 7h20" />
-              <path d="M22 7v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7" />
-            </svg>
-            <p className="text-sm font-medium text-gray-400 text-center line-clamp-3 max-w-[200px]">{selectedProduct.title}</p>
-          </div>
-        )}
-        {discount > 0 && (
-          <div className="absolute top-3 left-3 bg-green-500 text-white px-2 py-1 rounded-full text-sm font-bold">
-            -{discount}%
-          </div>
-        )}
-      </div>
-
-      {/* Product Info */}
-      <div className="p-4 space-y-4">
-        {/* Source Badge */}
-        <div className="flex items-center gap-2">
-          <span className={`text-xs font-medium px-2 py-1 rounded-full border ${sourceColors[selectedProduct.source] || 'bg-gray-100 text-gray-700 border-gray-200'}`}>
-            {sourceLabels[selectedProduct.source] || selectedProduct.source}
-          </span>
-          {selectedProduct.brand && (
-            <span className="text-xs text-muted-foreground">{selectedProduct.brand}</span>
-          )}
-        </div>
-
-        {/* Title */}
-        <h2 className="text-xl font-bold text-gray-900">{selectedProduct.title}</h2>
-
-        {/* Rating */}
-        {selectedProduct.rating && (
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-0.5">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <svg key={star} xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 ${star <= Math.round(selectedProduct.rating!) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                </svg>
-              ))}
-            </div>
-            <span className="text-sm text-muted-foreground">
-              {selectedProduct.rating} ({selectedProduct.reviewCount} reseñas)
-            </span>
-          </div>
-        )}
-
-        {/* Price */}
-        <div className="flex items-end gap-3">
-          <span className="text-3xl font-bold text-gray-900">{formatPrice(selectedProduct.price)}</span>
-          {selectedProduct.originalPrice && (
-            <span className="text-lg text-muted-foreground line-through">{formatPrice(selectedProduct.originalPrice)}</span>
-          )}
-        </div>
-
-        {/* Description */}
-        {selectedProduct.description && (
-          <div className="pt-2 border-t">
-            <h3 className="font-semibold mb-2">Descripción</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">{selectedProduct.description}</p>
-          </div>
-        )}
-
-        {/* Commission Info */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-          <div className="flex items-center gap-2 mb-1">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 16v-4" />
-              <path d="M12 8h.01" />
-            </svg>
-            <span className="text-sm font-medium text-blue-700">Precio de afiliado</span>
-          </div>
-          <p className="text-xs text-blue-600">Este precio incluye una comisión de {selectedProduct.commission}% por la derivación de ventas.</p>
-        </div>
-
-        {/* CTA Buttons */}
-        <div className="space-y-3 pt-2">
-          <a
-            href={buildAffiliateUrl(selectedProduct.sourceUrl, selectedProduct.source)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full bg-blue-500 text-white py-3.5 rounded-xl font-semibold text-center flex items-center justify-center gap-2 hover:bg-blue-600 transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-              <polyline points="15 3 21 3 21 9" />
-              <line x1="10" x2="21" y1="14" y2="3" />
-            </svg>
-            Ver en {sourceLabels[selectedProduct.source]}
-          </a>
-          <button className="w-full bg-gray-100 text-gray-700 py-3.5 rounded-xl font-medium hover:bg-gray-200 transition-colors">
-            Compartir producto
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
